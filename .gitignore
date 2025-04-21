@@ -1,0 +1,6 @@
+# Ignore nodemon-related files and folders
+nodemon/
+node_modules
+
+# Ignore environment files
+.env
