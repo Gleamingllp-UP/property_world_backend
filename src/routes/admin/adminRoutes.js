@@ -17,7 +17,7 @@ const {
   validateOnlyAllowedFields,
 } = require("../../middleWares/validateOnlyAllowedFields");
 const { validate } = require("../../middleWares/validate");
-const { verifyToken } = require("../../middleWares/verifyToken");
+const { verifyTokenAdmin } = require("../../middleWares/TokenVerification/verifyTokenAdmin");
 
 const adminRouter = express.Router();
 
@@ -39,7 +39,7 @@ adminRouter.post(
 
 adminRouter.post(
   adminEndpoints.updatePassword,
-  verifyToken,
+  verifyTokenAdmin,
   validateOnlyAllowedFields(["email", "newPassword"]),
   validateInputForPassword,
   validate,
@@ -48,7 +48,7 @@ adminRouter.post(
 
 adminRouter.post(
   adminEndpoints.forgetPassword,
-  verifyToken,
+  verifyTokenAdmin,
   validateOnlyAllowedFields(["email"]),
   validateInputForForgetPassword,
   validate,

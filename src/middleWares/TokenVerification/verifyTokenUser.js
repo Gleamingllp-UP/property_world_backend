@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-exports.verifyToken = async (req, res, next) => {
+exports.verifyTokenAdmin = async (req, res, next) => {
   const token =
     req.headers.authorization && req.headers.authorization.split(" ")[1];
 
@@ -9,9 +9,19 @@ exports.verifyToken = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY_FOR_USER);
+
+    if (decoded.role !== "admin") {
+      return res.status(403).json({
+        message: "Access denied. Admins only.",
+        success: false,
+        status: 403,
+      });
+    }
+
     req.user = decoded;
     next();
+    
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({

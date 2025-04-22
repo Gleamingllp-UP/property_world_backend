@@ -50,20 +50,24 @@ exports.adminRegistration = async (req, res) => {
 exports.adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
+
     const isAdminExist = await Admin.findOne({ email });
+
     if (!isAdminExist) {
-      res.status(404).json({
+      return res.status(404).json({
         message: "Admin not found",
         success: false,
         status: 404,
       });
     }
+
     const isValidPassword = await bcrypt.compare(
       password,
       isAdminExist.password
     );
+
     if (!isValidPassword) {
-      res.status(401).json({
+      return res.status(401).json({
         message: "Invalid password",
         success: false,
         status: 401,
@@ -73,6 +77,7 @@ exports.adminLogin = async (req, res) => {
         {
           id: isAdminExist._id,
           email: isAdminExist.email,
+          role: isAdminExist.role,
         },
         process.env.JWT_SECRET_KEY,
         { expiresIn: process.env.JWT_EXPIRATION_TIME }
@@ -316,7 +321,6 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    console.error(error);
     return res.status(500).json({
       message: "Internal server error",
       success: false,
