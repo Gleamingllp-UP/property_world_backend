@@ -25,11 +25,20 @@ mongoose
   })
   .catch((err) => {
     console.log("Mongodb is not connected...", err);
-  }); 
+  });
 
 const adminRoutes = require("./src/routes/admin/adminRoutes");
-app.use("/api/admin", adminRoutes);
- 
+app.use("/admin", adminRoutes);
+
+const userTypeRouter = require("./src/routes/user-types/userTypeRoutes");
+app.use("/user-type", userTypeRouter);
+
+const categoryRouter = require("./src/routes/category/categoryRoutes");
+app.use("/category", categoryRouter);
+
+const subCategoryRouter = require("./src/routes/sub-category/subCategoryRoutes");
+app.use("/sub-category", subCategoryRouter);
+
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);

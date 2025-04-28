@@ -1,4 +1,9 @@
 exports.validateOnlyAllowedFields = (allowedFields) => (req, res, next) => {
+
+  if (!req.body || typeof req.body !== 'object') {
+    return next();  
+  }
+
   const invalidFields = Object.keys(req.body).filter(
     (field) => !allowedFields.includes(field)
   );

@@ -23,6 +23,7 @@ const adminRouter = express.Router();
 
 adminRouter.post(
   adminEndpoints.registerAdmin,
+  verifyTokenAdmin,
   validateOnlyAllowedFields(["email", "password"]),
   validateRegisterInput,
   validate,

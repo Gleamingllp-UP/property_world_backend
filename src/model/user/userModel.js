@@ -1,28 +1,33 @@
 const mongoose = require("mongoose");
 const Role = require("../role/roleModel");
 
-const userSchema = mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  role: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Role",
+const userSchema = mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
       required: true,
     },
-  ],
-  tokenVersion: {
-    type: Number,
-    default: 0,
+    role: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Role",
+        required: true,
+      },
+    ],
+    tokenVersion: {
+      type: Number,
+      default: 0,
+    },
   },
-});
+  {
+    timestamps: true,
+  }
+);
 
 userSchema.pre("save", async (next) => {
   try {
