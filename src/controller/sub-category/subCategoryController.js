@@ -30,24 +30,10 @@ exports.addSubCategory = async (req, res) => {
 
     const result = await newSubCategory.save();
 
-    const populatedSubCategory = await SubCategory.findById(
-      result?._id
-    ).populate("categoryId", "name status");
-
-    const subCatObj = populatedSubCategory.toObject();
-
-    subCatObj.categoryData = subCatObj.categoryId || null;
-
-    delete subCatObj.categoryId;
-
-    if (subCatObj.categoryData && subCatObj.categoryData.status === false) {
-      subCatObj.status = false;
-    }
-
-    if (subCatObj) {
+    if (result) {
       return res.status(200).json({
         message: "SubCategory added successfully",
-        data: subCatObj,
+        data: result,
         success: true,
         status: 200,
       });

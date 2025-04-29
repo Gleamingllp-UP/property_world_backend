@@ -9,6 +9,7 @@ const userTypeSchema = mongoose.Schema(
     },
     status: {
       type: Boolean,
+      enum: [true, false],
       default: true,
     },
   },

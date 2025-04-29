@@ -39,6 +39,9 @@ app.use("/category", categoryRouter);
 const subCategoryRouter = require("./src/routes/sub-category/subCategoryRoutes");
 app.use("/sub-category", subCategoryRouter);
 
+const locationRouter = require("./src/routes/location/locationRoutes");
+app.use("/location", locationRouter);
+
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);

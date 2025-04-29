@@ -15,6 +15,7 @@ const subCategorySchema = mongoose.Schema(
     },
     status: {
       type: Boolean,
+      enum: [true, false],
       default: true,
     },
   },

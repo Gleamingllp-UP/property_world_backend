@@ -45,10 +45,26 @@ exports.addUserType = async (req, res) => {
 
 exports.getAllUserType = async (req, res) => {
   try {
-    const result = await UserType.find();
+    let { page = 1, limit = 10 } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const skip = (page - 1) * limit;
+    const result = await UserType.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const total = await UserType.countDocuments();
     if (result) {
       return res.status(200).json({
         message: "User type fetched",
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
         data: result,
         status: 200,
         success: true,
@@ -177,7 +193,7 @@ exports.updateUserTypeStatus = async (req, res) => {
     }
 
     const updatedStatus = !istypeExist.status;
-    
+
     const result = await UserType.findByIdAndUpdate(
       id,
       { status: updatedStatus },

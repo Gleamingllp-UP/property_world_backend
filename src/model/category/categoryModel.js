@@ -5,10 +5,11 @@ const categorySchema = mongoose.Schema(
     name: {
       type: String,
       required: true,
-      unique:true
+      unique: true,
     },
     status: {
       type: Boolean,
+      enum: [true, false],
       default: true,
     },
   },
