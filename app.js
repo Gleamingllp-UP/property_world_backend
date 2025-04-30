@@ -30,6 +30,9 @@ mongoose
 const adminRoutes = require("./src/routes/admin/adminRoutes");
 app.use("/admin", adminRoutes);
 
+const userRoutes = require("./src/routes/user/userRoutes");
+app.use("/user", userRoutes);
+
 const userTypeRouter = require("./src/routes/user-types/userTypeRoutes");
 app.use("/user-type", userTypeRouter);
 

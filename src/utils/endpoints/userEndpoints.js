@@ -1,4 +1,8 @@
 exports.userEndpoints={
+
+    initiateSignup:'/initiate-signup/',
+    verifyCode:'/verify-code/',
+    setPassword:'/set-password/',
     userLogin: '/login-user/',
     getUser: '/users/:id',
     getAllUser: '/users',

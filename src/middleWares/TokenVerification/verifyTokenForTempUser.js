@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-exports.verifyTokenUser = async (req, res, next) => {
+exports.verifyTokenForTempUser = async (req, res, next) => {
   const token =
     req.headers.authorization && req.headers.authorization.split(" ")[1];
 
@@ -9,18 +9,19 @@ exports.verifyTokenUser = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY_FOR_USER);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY_FOR_INITIATE_SIGNUP);
 
-    if (!decoded.role || decoded.role === "admin") {
+    if (decoded.role !== process.env.TEMP_ROLE) {
       return res.status(403).json({
-        message: "Access denied. Users only.",
+        message: "Access denied. Temporary Users only.",
         success: false,
         status: 403,
       });
     }
 
-    req.user = decoded;
+    req.tempUSer = decoded;
     next();
+    
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({
