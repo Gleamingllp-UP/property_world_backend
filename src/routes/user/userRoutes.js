@@ -1,11 +1,13 @@
 const express = require("express");
 const { userEndpoints } = require("../../utils/endpoints/userEndpoints");
 const {
-  addUser,
   userLogin,
   initiateSignup,
   verifyCode,
   setPassword,
+  getAllUsers,
+  initiateSignupByAdmin,
+  updateUserStatusWithKey,
 } = require("../../controller/user/userController");
 const {
   validateOnlyAllowedFields,
@@ -15,6 +17,7 @@ const {
   validatorUserVerifyCodeInput,
   validatorUserSetPasswordInput,
   validatorUserLoginInput,
+  validatorUserStatusWithKeyInput,
 } = require("../../validators/user");
 const { validate } = require("../../middleWares/validate");
 const {
@@ -23,14 +26,19 @@ const {
   setPasswordAllowedFields,
   userLoginAllowedFields,
 } = require("../../utils/validateFields/signUpFields");
-const { verifyTokenForTempUser } = require("../../middleWares/TokenVerification/verifyTokenForTempUser");
+const {
+  verifyTokenForTempUser,
+} = require("../../middleWares/TokenVerification/verifyTokenForTempUser");
+const {
+  verifyTokenAdmin,
+} = require("../../middleWares/TokenVerification/verifyTokenAdmin");
 
 const userRouter = express.Router();
 
 // userRouter.post(
 //   userEndpoints.createUser,
 //   validateOnlyAllowedFields(["email", "password"]),
-//   validateUserRegisterInput, 
+//   validateUserRegisterInput,
 //   validate,
 //   addUser
 // );
@@ -41,6 +49,15 @@ userRouter.post(
   validatorInitiateSignUp,
   validate,
   initiateSignup
+);
+
+userRouter.post(
+  userEndpoints.initiateSignupByAdmin,
+  verifyTokenAdmin,
+  validateOnlyAllowedFields(signUpAllowedFields),
+  validatorInitiateSignUp,
+  validate,
+  initiateSignupByAdmin
 );
 
 userRouter.post(
@@ -68,5 +85,16 @@ userRouter.post(
   validate,
   userLogin
 );
+
+userRouter.put(
+  userEndpoints.updateUserStatusWithKey,
+  verifyTokenAdmin,
+  validateOnlyAllowedFields(["key"]),
+  validatorUserStatusWithKeyInput,
+  validate,
+  updateUserStatusWithKey
+);
+
+userRouter.get(userEndpoints.getAllUser, verifyTokenAdmin, getAllUsers);
 
 module.exports = userRouter;

@@ -3,75 +3,87 @@ const UserType = require("../user-types/userTypeModel");
 
 const userSchema = mongoose.Schema(
   {
-     first_name: {
-       type: String,
-       required: true,
-     },
-     last_name: {
-       type: String,
-       required: true,
-     },
-     country_code: {
-       type: Number,
-       required: true,
-     },
-     phone_number: {
-       type: Number,
-       required: true,
-       unique: true,
-     },
-     dob: {
-       type: Date,
-       required: true,
-     },
-     country_of_residance: {
-       type: String,
-       required: true,
-     },
-     email: {
-       type: String,
-       required: true,
-       unique: true,
-     },
-     password: {
-       type: String,
-       required: true,
-     },
-     user_type: {
-       type: mongoose.Schema.Types.ObjectId,
-       ref: "UserType",
-       required: true,
-     },
- 
-     tokenVersion: {
-       type: Number,
-       default: 0,
-     },
-     is_accepted_privacy_and_policy: {
-       type: Boolean,
-       require: true,
-     },
-     is_accepted_terms_and_condition: {
-       type: Boolean,
-       require: true,
-     },
-     is_user_verified: {
-       type: Boolean,
-       default: false,
-     },
-     is_email_verified: {
-       type: Boolean,
-       default: false,
-     },
-     is_phone_verified: {
-       type: Boolean,
-       default: false,
-     },
-     is_blocked: {
-       type: Boolean,
-       default: false,
-     },
-   },
+    first_name: {
+      type: String,
+      required: true,
+    },
+    last_name: {
+      type: String,
+      required: true,
+    },
+    country_code: {
+      type: Number,
+      required: true,
+    },
+    phone_number: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
+    dob: {
+      type: Date,
+      required: true,
+    },
+    country_of_residance: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    user_type: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserType",
+      required: true,
+    },
+
+    tokenVersion: {
+      type: Number,
+      default: 0,
+    },
+    is_accepted_privacy_and_policy: {
+      type: Boolean,
+      require: true,
+    },
+    is_accepted_terms_and_condition: {
+      type: Boolean,
+      require: true,
+    },
+    is_user_verified_by_admin: {
+      type: Boolean,
+      default: false,
+    },
+    is_email_verified: {
+      type: Boolean,
+      default: false,
+    },
+    is_phone_verified: {
+      type: Boolean,
+      default: false,
+    },
+    is_blocked: {
+      type: Boolean,
+      default: false,
+    },
+    is_deleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
+    status: {
+      type: Boolean,
+      default: true,
+    },
+  },
   {
     timestamps: true,
   }

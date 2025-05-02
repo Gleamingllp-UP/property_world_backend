@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 
 exports.validatorUserVerifyCodeInput = [
   body("email")
@@ -26,7 +26,7 @@ exports.validatorUserVerifyCodeInput = [
 exports.validatorUserSetPasswordInput = [
   body("email")
     .notEmpty()
-    .withMessage("Email is required")
+    .withMessage("Email is required") 
     .bail()
     .isString()
     .withMessage("Email must be a string")
@@ -152,4 +152,20 @@ exports.validatorInitiateSignUp = [
     .isBoolean()
     .withMessage("Terms acceptance must be boolean")
     .bail(),
+];
+
+exports.validatorUserStatusWithKeyInput = [
+  param("id")
+    .notEmpty()
+    .withMessage("ID is required")
+    .bail()
+    .isMongoId()
+    .withMessage("Invalid ID format"),
+
+  body("key")
+    .notEmpty()
+    .withMessage("Key is required")
+    .bail()
+    .isString()
+    .withMessage("Key must be string"),
 ];
