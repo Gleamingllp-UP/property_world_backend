@@ -45,6 +45,9 @@ app.use("/sub-category", subCategoryRouter);
 const locationRouter = require("./src/routes/location/locationRoutes");
 app.use("/location", locationRouter);
 
+const blogRouter = require("./src/routes/blog/blogRoutes");
+app.use("/blog", blogRouter);
+
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);

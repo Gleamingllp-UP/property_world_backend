@@ -333,6 +333,13 @@ exports.userLogin = async (req, res) => {
         status: 403,
       });
     }
+    if (user?.is_deleted) {
+      return res.status(403).json({
+        message: "Your account is deleted. Contact support.",
+        success: false,
+        status: 403,
+      });
+    }
     if (!user?.status) {
       return res.status(403).json({
         message:
@@ -342,13 +349,13 @@ exports.userLogin = async (req, res) => {
       });
     }
 
-    // if (!user?.is_user_verified_by_admin) {
-    //   return res.status(403).json({
-    //     message: "Your account is pending admin approval.",
-    //     success: false,
-    //     status: 403,
-    //   });
-    // }
+    if (!user?.is_user_verified_by_admin) {
+      return res.status(403).json({
+        message: "Your account is pending admin approval.",
+        success: false,
+        status: 403,
+      });
+    }
 
     if (user?.is_blocked) {
       return res.status(403).json({
@@ -471,7 +478,7 @@ exports.getAllUsers = async (req, res) => {
         message: "User fetched successfully",
         pagination: {
           total,
-          page, 
+          page,
           limit,
           totalPages: Math.ceil(total / limit),
         },
