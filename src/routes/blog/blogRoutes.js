@@ -21,14 +21,18 @@ const {
   updateBlogPost,
   deleteBlogPost,
   getBlogPostById,
-  updateBlogPostStatus
+  updateBlogPostStatus,
 } = require("../../controller/blog/blogController");
+const {
+  dynamicSingleImageUpload,
+} = require("../../middleWares/fileUpload/uploadFile");
 
 const blogRouter = express.Router();
 
 blogRouter.post(
   blogEndpoints.createblog,
   verifyTokenAdmin,
+  dynamicSingleImageUpload("blog_img"),
   validateOnlyAllowedFields(blogAllowedFields),
   validatorBlogPostAddInput,
   validate,
@@ -48,6 +52,7 @@ blogRouter.get(
 blogRouter.put(
   blogEndpoints.updateblog,
   verifyTokenAdmin,
+  dynamicSingleImageUpload("blog_img"),
   validateOnlyAllowedFields(blogAllowedFields),
   validatorBlogPostUpdateInput,
   validate,

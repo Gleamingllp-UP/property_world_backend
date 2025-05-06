@@ -1,1 +1,1 @@
-exports.blogAllowedFields = ["title", "content", "coverImg", "author", "category"];
+exports.blogAllowedFields = ["title", "content", "blog_img", "author", "category"];

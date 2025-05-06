@@ -2,26 +2,23 @@ const { body, param } = require("express-validator");
 
 exports.validatorBlogPostAddInput = [
   body("title")
-    .not()
-    .isEmpty()
+    .notEmpty()
     .withMessage("Title is required")
     .bail(),
 
   body("content").not().isEmpty().withMessage("Content is required"),
 
   body("category")
-    .not()
-    .isEmpty()
+    .notEmpty()
     .withMessage("Category is required")
     .bail(),
 
   body("author")
-    .not()
-    .isEmpty()
+    .notEmpty()
     .withMessage("Author is required")
     .bail(),
 
-  body("coverImg").not().isEmpty().withMessage("Image is required"),
+  // body("coverImg").not().isEmpty().withMessage("Image is required"),
 ];
 
 exports.validatorBlogPostUpdateInput = [
@@ -33,51 +30,47 @@ exports.validatorBlogPostUpdateInput = [
     .withMessage("Invalid ID format"),
 
   body("title")
-    .not()
-    .isEmpty()
+    .notEmpty()
     .withMessage("Title is required")
     .bail(),
 
- 
-    body("content").not().isEmpty().withMessage("Content is required"),
+  body("content").not().isEmpty().withMessage("Content is required"),
 
-    body("category")
-      .not()
-      .isEmpty()
-      .withMessage("Category is required")
-      .bail(),
-  
-    body("author")
-      .not()
-      .isEmpty()
-      .withMessage("Author is required")
-      .bail(),
-  
-    body("coverImg").not().isEmpty().withMessage("Image is required"),
+  body("category")
+    .notEmpty()
+    .withMessage("Category is required")
+    .bail(),
+
+  body("author")
+    .notEmpty()
+    .withMessage("Author is required")
+    .bail(),
+
+  // body("coverImg").not().isEmpty().withMessage("Image is required"),
 ];
 
-exports.validatorBlogPostDeleteInput=[
-    param("id")
+exports.validatorBlogPostDeleteInput = [
+  param("id")
     .notEmpty()
     .withMessage("ID is required")
     .bail()
     .isMongoId()
     .withMessage("Invalid ID format"),
-]
+];
 
-exports.validatorBlogPostGetByIdInput=[
-    param("id")
+exports.validatorBlogPostGetByIdInput = [
+  param("id")
     .notEmpty()
     .withMessage("ID is required")
     .bail()
     .isMongoId()
     .withMessage("Invalid ID format"),
-]
-exports.validatorBlogPostUpdateStatusIdInput=[
-    param("id")
+];
+exports.validatorBlogPostUpdateStatusIdInput = [
+  param("id")
     .notEmpty()
     .withMessage("ID is required")
     .bail()
     .isMongoId()
     .withMessage("Invalid ID format"),
-]
+];

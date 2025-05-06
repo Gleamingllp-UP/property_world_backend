@@ -1,14 +1,34 @@
 const BlogPost = require("../../model/blog/blogModel");
+const {
+  uploadImageOnAwsReturnUrl,
+} = require("../../utils/functions/uploadFilesOnAws");
 
 exports.addBlogPost = async (req, res) => {
   try {
-    const { title, content, author, category, coverImg } = req.body;
+    const { title, content, author, category, blog_img } = req.body;
+    const file = req.files?.blog_img?.[0];
+
+    if (!file) {
+      return res.status(400).json({
+        message: "No file uploaded",
+        success: false,
+        status: 400,
+      });
+    }
+
+    let blogImageBase64 = null;
+    if (blog_img) {
+      blogImageBase64 = blog_img;
+    } else if (file) {
+      blogImageBase64 = await uploadImageOnAwsReturnUrl(file);
+    }
+
     const blogPost = new BlogPost({
       title,
       content,
       author,
       category,
-      coverImg,
+      coverImg: blogImageBase64,
     });
     const blogResult = await blogPost.save();
 
@@ -106,14 +126,24 @@ exports.getBlogPostById = async (req, res) => {
 exports.updateBlogPost = async (req, res) => {
   try {
     const blogPostId = req.params.id;
-    const { title, content, author, category, coverImg } = req.body;
+    const { title, content, author, category, blog_img } = req.body;
+
+    let blogImageBase64 = null;
+    if (blog_img) {
+      blogImageBase64 = blog_img;
+    } else {
+      const file = req.files?.blog_img?.[0];
+      blogImageBase64 = await uploadImageOnAwsReturnUrl(file);
+    }
+
     const updateData = {
       title,
       content,
       author,
       category,
-      coverImg,
+      coverImg: blogImageBase64,
     };
+
     const blogPost = await BlogPost.findById(blogPostId);
 
     if (!blogPost) {
@@ -192,7 +222,7 @@ exports.updateBlogPostStatus = async (req, res) => {
         success: false,
       });
     }
-   
+
     const updatedStatus = !blogPost.status;
     const result = await BlogPost.findByIdAndUpdate(
       id,
