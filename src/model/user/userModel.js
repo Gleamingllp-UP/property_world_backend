@@ -42,11 +42,18 @@ const userSchema = mongoose.Schema(
       ref: "UserType",
       required: true,
     },
-
-    tokenVersion: {
-      type: Number,
-      default: 0,
-    },
+    saved_properties: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Property",
+      },
+    ],
+    liked_properties: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Property",
+      },
+    ],
     is_accepted_privacy_and_policy: {
       type: Boolean,
       require: true,
@@ -78,6 +85,10 @@ const userSchema = mongoose.Schema(
     deletedAt: {
       type: Date,
       default: null,
+    },
+    tokenVersion: {
+      type: Number,
+      default: 0,
     },
     status: {
       type: Boolean,

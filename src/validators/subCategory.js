@@ -5,7 +5,7 @@ exports.validateSubCategoryInput = [
     .notEmpty()
     .withMessage("Name is required")
     .bail()
-    .matches(/^[A-Za-z]+$/)
+    .matches(/^[A-Za-z]+(?: [A-Za-z]+)*$/)
     .withMessage("Invalid format"),
     
   body("categoryId")
@@ -21,7 +21,7 @@ exports.validateSubCategoryUpdateInput = [
     .notEmpty()
     .withMessage("Name is required")
     .bail()
-    .matches(/^[A-Za-z]+$/)
+    .matches(/^[A-Za-z]+(?: [A-Za-z]+)*$/)
     .withMessage("Invalid format"),
 
   body("categoryId")

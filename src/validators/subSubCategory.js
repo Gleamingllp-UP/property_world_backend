@@ -1,15 +1,22 @@
 const { body, param } = require("express-validator");
 
-exports.validateCategoryInput = [
+exports.validateSubSubCategoryInput = [
   body("name")
     .notEmpty()
     .withMessage("Name is required")
     .bail()
     .matches(/^[A-Za-z]+(?: [A-Za-z]+)*$/)
     .withMessage("Invalid format"),
+    
+  body("subCategoryId")
+    .notEmpty()
+    .withMessage("subCategoryId is required")
+    .bail()
+    .isMongoId()
+    .withMessage("Invalid subCategoryId format"),
 ];
 
-exports.validateCategoryUpdateInput = [
+exports.validateSubSubCategoryUpdateInput = [
   body("name")
     .notEmpty()
     .withMessage("Name is required")
@@ -17,6 +24,13 @@ exports.validateCategoryUpdateInput = [
     .matches(/^[A-Za-z]+(?: [A-Za-z]+)*$/)
     .withMessage("Invalid format"),
 
+  body("subCategoryId")
+    .notEmpty()
+    .withMessage("subCategoryId is required")
+    .bail()
+    .isMongoId()
+    .withMessage("Invalid subCategoryId format"),
+
   param("id")
     .notEmpty()
     .withMessage("ID is required")
@@ -25,7 +39,7 @@ exports.validateCategoryUpdateInput = [
     .withMessage("Invalid ID format"),
 ];
 
-exports.validateCategoryDeleteInput = [
+exports.validateSubSubCategoryDeleteInput = [
   param("id")
     .notEmpty()
     .withMessage("ID is required")
@@ -34,12 +48,11 @@ exports.validateCategoryDeleteInput = [
     .withMessage("Invalid ID format"),
 ];
 
-exports.validateCategoryStatusInput = [
+exports.validateSubSubCategoryStatusInput = [
   param("id")
     .notEmpty()
     .withMessage("ID is required")
     .bail()
     .isMongoId()
     .withMessage("Invalid ID format"),
-
 ];

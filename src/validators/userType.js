@@ -5,7 +5,7 @@ exports.validateUserTypeInput = [
     .notEmpty()
     .withMessage("Name is required")
     .bail()
-    .matches(/^[A-Za-z]+$/)
+    .matches(/^[A-Za-z]+(?: [A-Za-z]+)*$/)
     .withMessage("Invalid format"),
 ];
 
@@ -14,7 +14,7 @@ exports.validateUserTypeUpdateInput = [
     .notEmpty()
     .withMessage("Name is required")
     .bail()
-    .matches(/^[A-Za-z]+$/)
+    .matches(/^[A-Za-z]+(?: [A-Za-z]+)*$/)
     .withMessage("Invalid format"),
 
   param("id")

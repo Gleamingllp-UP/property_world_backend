@@ -42,6 +42,9 @@ app.use("/category", categoryRouter);
 const subCategoryRouter = require("./src/routes/sub-category/subCategoryRoutes");
 app.use("/sub-category", subCategoryRouter);
 
+const subSubCategoryRouter = require("./src/routes/sub-sub-category/subSubCategoryRoutes");
+app.use("/sub-sub-category", subSubCategoryRouter);
+
 const locationRouter = require("./src/routes/location/locationRoutes");
 app.use("/location", locationRouter);
 

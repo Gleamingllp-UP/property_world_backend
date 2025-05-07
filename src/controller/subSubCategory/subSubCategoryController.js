@@ -1,45 +1,45 @@
+const SubSubCategory = require("../../model/SubSubCategory/SubSubCategory");
 const SubCategory = require("../../model/sub-category/subCategoryModel");
-const Category = require("../../model/category/categoryModel");
 
-exports.addSubCategory = async (req, res) => {
+exports.addSubSubCategory = async (req, res) => {
   try {
-    const { name, categoryId } = req.body;
+    const { name, subCategoryId } = req.body;
 
-    const isSubCategoryExist = await SubCategory.findOne({ name ,categoryId});
+    const isSubCategoryExist = await SubSubCategory.findOne({ name });
     if (isSubCategoryExist) {
       return res.status(400).json({
-        message: "SubCategory already exists",
+        message: "Sub-SubCategory already exists",
         status: 400,
         success: false,
       });
     }
 
-    const isCategoryExist = await Category.findById(categoryId);
+    const isCategoryExist = await SubCategory.findById(subCategoryId);
     if (!isCategoryExist) {
       return res.status(400).json({
-        message: "Category does not exist",
+        message: "Sub-Category does not exist",
         status: 400,
         success: false,
       });
     }
 
-    const newSubCategory = new SubCategory({
+    const newSubSubCategory = new SubSubCategory({
       name,
-      categoryId,
+      subCategoryId,
     });
 
-    const result = await newSubCategory.save();
+    const result = await newSubSubCategory.save();
 
     if (result) {
       return res.status(200).json({
-        message: "SubCategory added successfully",
+        message: "Sub-SubCategory added successfully",
         data: result,
         success: true,
         status: 200,
       });
     } else {
       return res.status(400).json({
-        message: "Failed to create SubCategory",
+        message: "Failed to create Sub-SubCategory",
         success: false,
         status: 400,
       });
@@ -54,44 +54,44 @@ exports.addSubCategory = async (req, res) => {
   }
 };
 
-exports.getAllSubCategory = async (req, res) => {
+exports.getAllSubSubCategory = async (req, res) => {
   try {
-    let { page = 1, limit = 10,categoryId } = req.query;
+    let { page = 1, limit = 10,subCategoryId } = req.query;
     page = parseInt(page);
     limit = parseInt(limit);
 
     const skip = (page - 1) * limit;
 
     const filter = {};
-    if (categoryId) {
-      filter.categoryId = categoryId;
+    if (subCategoryId) {
+      filter.subCategoryId = subCategoryId;
     }
 
-    const result = await SubCategory.find(filter)
-      .populate("categoryId", "name status")
+    const result = await SubSubCategory.find(filter)
+      .populate("subCategoryId", "name status")
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
 
-    const total = await SubCategory.countDocuments(filter);
+    const total = await SubSubCategory.countDocuments(filter);
 
-    const modifiedResult = result.map((subCat) => {
-      const subCatObj = subCat.toObject();
+    const modifiedResult = result.map((subSubCat) => {
+      const subSubCatObj = subSubCat.toObject();
 
-      subCatObj.categoryData = subCatObj.categoryId || null;
+      subSubCatObj.subCategoryData = subSubCatObj.subCategoryId || null;
 
-      delete subCatObj.categoryId;
+      delete subSubCatObj.subCategoryId;
 
-      if (subCatObj.categoryData && subCatObj.categoryData.status === false) {
-        subCatObj.status = false;
+      if (subSubCatObj.subCategoryData && subSubCatObj.subCategoryData.status === false) {
+        subSubCatObj.status = false;
       }
 
-      return subCatObj;
+      return subSubCatObj;
     });
 
     if (modifiedResult) {
       return res.status(200).json({
-        message: "SubCategories fetched successfully",
+        message: "Sub-SubCategories fetched successfully",
         data: modifiedResult,
         pagination: {
           total,
@@ -119,25 +119,25 @@ exports.getAllSubCategory = async (req, res) => {
   }
 };
 
-exports.updateSubCategory = async (req, res) => {
+exports.updateSubSubCategory = async (req, res) => {
   try {
-    const { name, categoryId } = req.body;
+    const { name, subCategoryId } = req.body;
     const { id } = req.params;
 
-    const existingSubCategory = await SubCategory.findOne({
+    const existingSubSubCategory = await SubSubCategory.findOne({
       name: { $regex: `^${name}$`, $options: "i" },
     });
 
-    if (existingSubCategory && existingSubCategory._id.toString() !== id) {
+    if (existingSubSubCategory && existingSubSubCategory._id.toString() !== id) {
       return res.status(400).json({
-        message: "SubCategory with this name already exists",
+        message: "Sub-SubCategory with this name already exists",
         status: 400,
         success: false,
       });
     }
 
-    const isSubCategoryExist = await SubCategory.findById(id);
-    if (!isSubCategoryExist) {
+    const isSubSubCategoryExist = await SubSubCategory.findById(id);
+    if (!isSubSubCategoryExist) {
       return res.status(400).json({
         message: "SubCategory does not exist",
         status: 400,
@@ -145,48 +145,48 @@ exports.updateSubCategory = async (req, res) => {
       });
     }
 
-    if (categoryId) {
-      const isCategoryExist = await Category.findById(categoryId);
-      if (!isCategoryExist) {
+    if (subCategoryId) {
+      const isSubCategoryExist = await SubCategory.findById(subCategoryId);
+      if (!isSubCategoryExist) {
         return res.status(400).json({
-          message: "Provided Category does not exist",
+          message: "Provided SubCategory does not exist",
           status: 400,
           success: false,
         });
       }
-      isSubCategoryExist.categoryId = categoryId;
+      isSubSubCategoryExist.subCategoryId = subCategoryId;
     }
 
     if (name) {
-      isSubCategoryExist.name = name;
+      isSubSubCategoryExist.name = name;
     }
 
-    const result = await isSubCategoryExist.save();
+    const result = await isSubSubCategoryExist.save();
 
-    const populatedSubCategory = await SubCategory.findById(
+    const populatedSubSubCategory = await SubSubCategory.findById(
         result?._id
-      ).populate("categoryId", "name status");
+      ).populate("subCategoryId", "name status");
   
-      const subCatObj = populatedSubCategory.toObject();
+      const subSubCatObj = populatedSubSubCategory.toObject();
   
-      subCatObj.categoryData = subCatObj.categoryId || null;
+      subSubCatObj.subCategoryData = subSubCatObj.subCategoryId || null;
   
-      delete subCatObj.categoryId;
+      delete subSubCatObj.subCategoryId;
   
-      if (subCatObj.categoryData && subCatObj.categoryData.status === false) {
-        subCatObj.status = false;
+      if (subSubCatObj.subCategoryData && subSubCatObj.subCategoryData.status === false) {
+        subSubCatObj.status = false;
       }
 
-    if (subCatObj) {
+    if (subSubCatObj) {
       return res.status(200).json({
-        message: "SubCategory updated successfully",
-        data: subCatObj,
+        message: "Sub-SubCategory updated successfully",
+        data: subSubCatObj,
         success: true,
         status: 200,
       });
     } else {
       return res.status(400).json({
-        message: "Failed to update SubCategory",
+        message: "Failed to update Sub-SubCategory",
         success: false,
         status: 400,
       });
@@ -201,23 +201,23 @@ exports.updateSubCategory = async (req, res) => {
   }
 };
 
-exports.deleteSubCategory = async (req, res) => {
+exports.deleteSubSubCategory = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const isSubCategoryExist = await SubCategory.findById(id);
-    if (!isSubCategoryExist) {
+    const isSubSubCategoryExist = await SubSubCategory.findById(id);
+    if (!isSubSubCategoryExist) {
       return res.status(400).json({
-        message: "SubCategory does not exist",
+        message: "Sub-SubCategory does not exist",
         status: 400,
         success: false,
       });
     }
 
-    const result = await SubCategory.findByIdAndDelete(id);
+    const result = await SubSubCategory.findByIdAndDelete(id);
     if (result) {
       return res.status(200).json({
-        message: "SubCategory deleted successfully!",
+        message: "Sub-SubCategory deleted successfully!",
         id: id,
         data: result,
         status: 200,
@@ -240,22 +240,22 @@ exports.deleteSubCategory = async (req, res) => {
   }
 };
 
-exports.updateSubCategoryStatus = async (req, res) => {
+exports.updateSubSubCategoryStatus = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const isSubCategoryExist = await SubCategory.findById(id);
-    if (!isSubCategoryExist) {
+    const isSubSubCategoryExist = await SubSubCategory.findById(id);
+    if (!isSubSubCategoryExist) {
       return res.status(400).json({
-        message: "SubCategory does not exist",
+        message: "Sub-SubCategory does not exist",
         status: 400,
         success: false,
       });
     }
 
-    const updatedStatus = !isSubCategoryExist.status;
+    const updatedStatus = !isSubSubCategoryExist.status;
 
-    const result = await SubCategory.findByIdAndUpdate(
+    const result = await SubSubCategory.findByIdAndUpdate(
       id,
       { status: updatedStatus },
       { new: true }
@@ -263,7 +263,7 @@ exports.updateSubCategoryStatus = async (req, res) => {
 
     if (result) {
       return res.status(200).json({
-        message: "SubCategory status updated successfully!",
+        message: "Sub-SubCategory status updated successfully!",
         id,
         data: result,
         status: 200,
@@ -271,7 +271,7 @@ exports.updateSubCategoryStatus = async (req, res) => {
       });
     } else {
       return res.status(500).json({
-        message: "Error updating SubCategory",
+        message: "Error updating Sub-SubCategory",
         status: 500,
         success: false,
       });
