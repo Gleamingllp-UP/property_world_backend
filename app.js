@@ -51,6 +51,9 @@ app.use("/location", locationRouter);
 const blogRouter = require("./src/routes/blog/blogRoutes");
 app.use("/blog", blogRouter);
 
+const aboutUsRouter = require("./src/routes/aboutUs/aboutUsRoutes");
+app.use("/about-us", aboutUsRouter);
+
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
