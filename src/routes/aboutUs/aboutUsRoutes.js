@@ -42,7 +42,7 @@ aboutUsRouter.post(
   addAboutUs
 );
 
-aboutUsRouter.get(aboutUsEndpoints.getAboutUs, verifyTokenAdmin, getAllAboutUs);
+aboutUsRouter.get(aboutUsEndpoints.getAllAboutUs, verifyTokenAdmin, getAllAboutUs);
 
 aboutUsRouter.put(
   aboutUsEndpoints.updateAboutUs,
