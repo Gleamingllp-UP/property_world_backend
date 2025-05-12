@@ -12,6 +12,7 @@ const {
   validateCategoryInput,
   validateCategoryUpdateInput,
   validateCategoryDeleteInput,
+  validateCategoryStatusInput,
 } = require("../../validators/category");
 const { validate } = require("../../middleWares/validate");
 const {
@@ -61,7 +62,7 @@ categoryRouter.put(
   CategoryEndpoints.updateCategoryStatus,
   verifyTokenAdmin,
   validateOnlyAllowedFields([]),
-  validateCategoryDeleteInput,
+  validateCategoryStatusInput,
   validate,
   updateCategoryStatus
 );

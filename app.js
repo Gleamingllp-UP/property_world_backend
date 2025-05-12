@@ -51,8 +51,14 @@ app.use("/location", locationRouter);
 const blogRouter = require("./src/routes/blog/blogRoutes");
 app.use("/blog", blogRouter);
 
+const blogCategoryRouter = require("./src/routes/blogCategory/blogCategoryRoutes");
+app.use("/blog-category", blogCategoryRouter);
+
 const aboutUsRouter = require("./src/routes/aboutUs/aboutUsRoutes");
 app.use("/about-us", aboutUsRouter);
+
+const contactUsRouter = require("./src/routes/contactUs/contactUsRoutes");
+app.use("/contact-us", contactUsRouter);
 
 const port = process.env.PORT;
 app.listen(port, () => {

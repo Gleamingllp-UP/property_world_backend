@@ -38,19 +38,19 @@ exports.addAboutUs = async (req, res) => {
 
     const profileImageUrl = profileFile
       ? await uploadImageOnAwsReturnUrl(profileFile)
-      : profile;
+      : null;
 
     const visionImageUrl = visionFile
       ? await uploadImageOnAwsReturnUrl(visionFile)
-      : vision;
+      : null;
 
     const visionBgImageUrl = visionBgFile
       ? await uploadImageOnAwsReturnUrl(visionBgFile)
-      : visionBg;
+      : null;
 
     const missionImageUrl = missionFile
       ? await uploadImageOnAwsReturnUrl(missionFile)
-      : mission;
+      : null;
 
     const newAboutUs = new AboutUs({
       profile: {

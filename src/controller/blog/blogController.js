@@ -2,10 +2,12 @@ const BlogPost = require("../../model/blog/blogModel");
 const {
   uploadImageOnAwsReturnUrl,
 } = require("../../utils/functions/uploadFilesOnAws");
+const BlogCategory = require("../../model/blogCategory/blogCategoryModel");
+const mongoose = require("mongoose");
 
 exports.addBlogPost = async (req, res) => {
   try {
-    const { title, content, author, category, blog_img } = req.body;
+    const { title, content, author, blog_img, blog_category_id } = req.body;
     const file = req.files?.blog_img?.[0];
 
     if (!file) {
@@ -13,6 +15,15 @@ exports.addBlogPost = async (req, res) => {
         message: "No file uploaded",
         success: false,
         status: 400,
+      });
+    }
+
+    const isBlogCategoryExist = await BlogCategory.findById(blog_category_id);
+    if (!isBlogCategoryExist) {
+      return res.status(400).json({
+        message: "Blog Category does not exist",
+        status: 400,
+        success: false,
       });
     }
 
@@ -27,9 +38,10 @@ exports.addBlogPost = async (req, res) => {
       title,
       content,
       author,
-      category,
+      blogCategoryId: blog_category_id,
       coverImg: blogImageBase64,
     });
+
     const blogResult = await blogPost.save();
 
     if (!blogResult) {
@@ -58,25 +70,56 @@ exports.addBlogPost = async (req, res) => {
 
 exports.getAllBlogPost = async (req, res) => {
   try {
-    let { page = 1, limit = 10 } = req.params;
+    let { page = 1, limit = 10, blog_category_id } = req.query;
 
     page = parseInt(page);
     limit = parseInt(limit);
+
     const skip = (page - 1) * limit;
 
-    const blogPost = await BlogPost.find()
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 });
+    const filter = {};
 
-    const total = await BlogPost.countDocuments();
+    if (blog_category_id && mongoose.Types.ObjectId.isValid(blog_category_id)) {
+      filter.blogCategoryId = new mongoose.Types.ObjectId(
+        String(blog_category_id)
+      );
+    }
 
-    if (blogPost) {
+    const blogResult = await BlogPost.aggregate([
+      { $match: filter },
+      {
+        $lookup: {
+          from: "blogcategories",
+          localField: "blogCategoryId",
+          foreignField: "_id",
+          as: "blog_category",
+        },
+      },
+      //$unwind fails when blog_category is empty or missing so we can use like this
+      { $unwind: { path: "$blog_category", preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          blogCategory: {
+            _id: "$blog_category._id",
+            name: "$blog_category.name",
+            status: "$blog_category.status",
+          },
+        },
+      },
+      { $unset: ["blog_category", "blogCategoryId"] },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
+
+    const total = await BlogPost.countDocuments(filter);
+
+    if (blogResult) {
       return res.status(200).json({
         message: "Blog post retrieved successfully",
         status: 200,
         success: true,
-        data: blogPost,
+        data: blogResult,
         pagination: {
           page,
           limit,
@@ -126,7 +169,17 @@ exports.getBlogPostById = async (req, res) => {
 exports.updateBlogPost = async (req, res) => {
   try {
     const blogPostId = req.params.id;
-    const { title, content, author, category, blog_img } = req.body;
+    const { title, content, author, blog_category_id, blog_img } = req.body;
+
+    const blogPost = await BlogPost.findById(blogPostId);
+
+    if (!blogPost) {
+      return res.status(404).json({
+        message: "Blog post not found",
+        status: 404,
+        success: false,
+      });
+    }
 
     let blogImageBase64 = null;
     if (blog_img) {
@@ -140,19 +193,10 @@ exports.updateBlogPost = async (req, res) => {
       title,
       content,
       author,
-      category,
+      blogCategoryId: blog_category_id,
       coverImg: blogImageBase64,
     };
 
-    const blogPost = await BlogPost.findById(blogPostId);
-
-    if (!blogPost) {
-      return res.status(404).json({
-        message: "Blog post not found",
-        status: 404,
-        success: false,
-      });
-    }
     const updatedPost = await BlogPost.findByIdAndUpdate(
       blogPostId,
       updateData,

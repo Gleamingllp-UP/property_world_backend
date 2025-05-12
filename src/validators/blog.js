@@ -8,9 +8,9 @@ exports.validatorBlogPostAddInput = [
 
   body("content").not().isEmpty().withMessage("Content is required"),
 
-  body("category")
+  body("blog_category_id")
     .notEmpty()
-    .withMessage("Category is required")
+    .withMessage("Blog Category is required")
     .bail(),
 
   body("author")
@@ -36,9 +36,9 @@ exports.validatorBlogPostUpdateInput = [
 
   body("content").not().isEmpty().withMessage("Content is required"),
 
-  body("category")
+  body("blog_category_id")
     .notEmpty()
-    .withMessage("Category is required")
+    .withMessage("Blog Category is required")
     .bail(),
 
   body("author")

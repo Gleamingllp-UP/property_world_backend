@@ -8,6 +8,7 @@ const {
 } = require("../../middleWares/validateOnlyAllowedFields");
 const {
   aboutUsAllowedFields,
+  aboutUsAllowedFieldsForUpdate,
 } = require("../../utils/validateFields/aboutUsFields");
 const {
   validatorAddAboutUsInput,
@@ -53,7 +54,7 @@ aboutUsRouter.put(
     { name: "visionBg", maxCount: 1 },
     { name: "mission", maxCount: 1 },
   ]),
-  validateOnlyAllowedFields(aboutUsAllowedFields),
+  validateOnlyAllowedFields(aboutUsAllowedFieldsForUpdate),
   validatorAboutUsUpdateInput,
   validate,
   updateAboutUs
