@@ -60,6 +60,9 @@ app.use("/about-us", aboutUsRouter);
 const contactUsRouter = require("./src/routes/contactUs/contactUsRoutes");
 app.use("/contact-us", contactUsRouter);
 
+const policyRouter = require("./src/routes/policy/policyRoutes");
+app.use("/policy", policyRouter);
+
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
