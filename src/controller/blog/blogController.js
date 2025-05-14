@@ -138,27 +138,97 @@ exports.getAllBlogPost = async (req, res) => {
   }
 };
 
+// exports.getBlogPostById = async (req, res) => {
+//   try {
+//     const blogPostId = req.params.id;
+//     const blogPost = await BlogPost.findById(blogPostId);
+//     if (blogPost) {
+//       return res.status(200).json({
+//         message: "Blog post retrieved successfully",
+//         status: 200,
+//         success: true,
+//         data: blogPost,
+//       });
+//     } else {
+//       return res.status(404).json({
+//         message: "Blog post not found",
+//         status: 404,
+//         success: false,
+//       });
+//     }
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Internal Server error",
+//       error: error?.message,
+//       status: 500,
+//       success: false,
+//     });
+//   }
+// };
+
 exports.getBlogPostById = async (req, res) => {
   try {
     const blogPostId = req.params.id;
-    const blogPost = await BlogPost.findById(blogPostId);
-    if (blogPost) {
-      return res.status(200).json({
-        message: "Blog post retrieved successfully",
-        status: 200,
-        success: true,
-        data: blogPost,
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(blogPostId)) {
+      return res.status(400).json({
+        message: "Invalid blog post ID",
+        status: 400,
+        success: false,
       });
-    } else {
+    }
+
+    // Find blog post with category info using aggregation
+    const blogResult = await BlogPost.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(String(blogPostId)) } },
+      {
+        $lookup: {
+          from: "blogcategories",
+          localField: "blogCategoryId",
+          foreignField: "_id",
+          as: "blog_category",
+        },
+      },
+      {
+        $unwind: {
+          path: "$blog_category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          blogCategory: {
+            _id: "$blog_category._id",
+            name: "$blog_category.name",
+            status: "$blog_category.status",
+          },
+        },
+      },
+      {
+        $unset: ["blog_category", "blogCategoryId"],
+      },
+    ]);
+
+    const blogPost = blogResult[0];
+
+    if (!blogPost) {
       return res.status(404).json({
         message: "Blog post not found",
         status: 404,
         success: false,
       });
     }
+
+    return res.status(200).json({
+      message: "Blog post retrieved successfully",
+      status: 200,
+      success: true,
+      data: blogPost,
+    });
   } catch (error) {
     return res.status(500).json({
-      message: "Internal Server error",
+      message: "Internal server error",
       error: error?.message,
       status: 500,
       success: false,
