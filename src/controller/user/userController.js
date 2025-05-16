@@ -29,16 +29,22 @@ exports.initiateSignup = async (req, res) => {
       is_accepted_terms_and_condition,
     } = req.body;
 
-    const existing = await TempUser.findOne({
+    const existingTempUser = await TempUser.findOne({
+      $or: [{ email }, { phone_number }],
+    });
+    const isUserExist = await User.findOne({
       $or: [{ email }, { phone_number }],
     });
 
-    if (existing) {
+    if (isUserExist) {
       return res.status(400).json({
         message: "User with this email or phone number already exists.",
         success: false,
         status: 400,
       });
+    }
+    if (existingTempUser) {
+      await existingTempUser.deleteOne();
     }
 
     // Generate code and expiration
@@ -288,7 +294,7 @@ exports.initiateSignupByAdmin = async (req, res) => {
 
     if (!resultUser || !resultUser?._id) {
       return res.status(500).json({
-        message: "Failed to save temporary user",
+        message: "Failed to save user",
         success: false,
         status: 500,
       });

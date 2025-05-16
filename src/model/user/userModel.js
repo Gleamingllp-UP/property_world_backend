@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 const UserType = require("../user-types/userTypeModel");
+const Property = require("../../model/property/propertyModel");
+
+const options = { discriminatorKey: "user_type", timestamps: true };
 
 const userSchema = mongoose.Schema(
   {
@@ -95,9 +98,7 @@ const userSchema = mongoose.Schema(
       default: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  options
 );
 
 userSchema.pre("save", async (next) => {
@@ -107,6 +108,27 @@ userSchema.pre("save", async (next) => {
     if (!isUserTypeExist) {
       return next(new Error("User Type is not exists"));
     }
+
+    if (this.saved_properties && this.saved_properties.length > 0) {
+      const savedPropsCount = await Property.countDocuments({
+        _id: { $in: this.saved_properties },
+      });
+
+      if (savedPropsCount !== this.saved_properties.length) {
+        return next(new Error("One or more saved properties do not exist"));
+      }
+    }
+
+    if (this.liked_properties && this.liked_properties.length > 0) {
+      const likedPropsCount = await Property.countDocuments({
+        _id: { $in: this.liked_properties },
+      });
+
+      if (likedPropsCount !== this.liked_properties.length) {
+        return next(new Error("One or more liked properties do not exist"));
+      }
+    }
+
     next();
   } catch (error) {
     next(error);
