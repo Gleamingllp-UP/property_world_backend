@@ -8,6 +8,7 @@ const {
   updateUserType,
   deleteUserType,
   updateUserTypeStatus,
+  getAllUserTypeForUser,
 } = require("../../controller/user-types/userTypeController");
 const {
   verifyTokenAdmin,
@@ -39,6 +40,11 @@ userTypeRouter.get(
   getAllUserType
 );
 
+userTypeRouter.get(
+  userTypeEndpoints.getAllActiveUserType,
+  getAllUserTypeForUser
+);
+
 userTypeRouter.put(
   userTypeEndpoints.updateUserType,
   verifyTokenAdmin,
@@ -64,6 +70,6 @@ userTypeRouter.put(
   validateUserTypeStatusInput,
   validate,
   updateUserTypeStatus
-)
+);
 
 module.exports = userTypeRouter;
