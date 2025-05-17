@@ -6,6 +6,9 @@ const {
   verifyTokenAdmin,
 } = require("../../middleWares/TokenVerification/verifyTokenAdmin");
 const {
+  verifyTokenUser,
+} = require("../../middleWares/TokenVerification/verifyTokenUser");
+const {
   validateOnlyAllowedFields,
 } = require("../../middleWares/validateOnlyAllowedFields");
 const {
@@ -20,7 +23,8 @@ const {
   getAllSubSubCategory,
   deleteSubSubCategory,
   updateSubSubCategory,
-  updateSubSubCategoryStatus
+  updateSubSubCategoryStatus,
+  getAllActiveSubSubCategory
 } = require("../../controller/subSubCategory/subSubCategoryController");
 
 const subSubCategoryRouter = express.Router();
@@ -39,6 +43,8 @@ subSubCategoryRouter.get(
   verifyTokenAdmin,
   getAllSubSubCategory
 );
+
+
 
 subSubCategoryRouter.put(
   subSubCategoryEndpoints.updatesubSubCategory,
@@ -65,6 +71,13 @@ subSubCategoryRouter.put(
   validateSubSubCategoryStatusInput,
   validate,
   updateSubSubCategoryStatus
+);
+
+//For User
+subSubCategoryRouter.get(
+  subSubCategoryEndpoints.getAllActivesubSubCategory,
+  verifyTokenUser,
+  getAllActiveSubSubCategory
 );
 
 module.exports = subSubCategoryRouter;

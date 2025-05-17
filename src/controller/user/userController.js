@@ -1,7 +1,9 @@
 const User = require("../../model/user/userModel");
+const UserType = require("../../model/user-types/userTypeModel");
 const generateCode = require("../../utils/functions/generateCode");
 const bcrypt = require("bcryptjs");
 const TempUser = require("../../model/user/tempUserModel");
+const TempAgentUser = require("../../model/user/tempAgentModel");
 const mongoose = require("mongoose");
 const sendEmailForCode = require("../../utils/sendEmails/sendEmailForCode");
 const {
@@ -27,6 +29,15 @@ exports.initiateSignup = async (req, res) => {
       user_type,
       is_accepted_privacy_and_policy,
       is_accepted_terms_and_condition,
+
+      // Agent-specific fields
+      trade_license,
+      company_name,
+      office_address,
+      broker_license_number,
+      office_registration_number,
+      agency_logo,
+      agent_photo,
     } = req.body;
 
     const existingTempUser = await TempUser.findOne({
@@ -53,44 +64,103 @@ exports.initiateSignup = async (req, res) => {
 
     // await sendEmailForCode(email, code);
 
-    const resultTempUser = await TempUser.create({
-      first_name,
-      last_name,
-      country_code,
-      phone_number,
-      dob,
-      country_of_residance,
-      email,
-      user_type,
-      is_accepted_privacy_and_policy,
-      is_accepted_terms_and_condition,
-      codeExpires,
-      code,
-    });
-
-    if (!resultTempUser || !resultTempUser?._id) {
-      return res.status(500).json({
-        message: "Failed to save temporary user",
+    const isUserTypeExist = await UserType.findById({ _id: user_type });
+    if (!isUserTypeExist) {
+      return res.status(400).json({
+        message: "User type does not exist.",
         success: false,
-        status: 500,
+        status: 400,
       });
     }
 
-    const payload = {
-      id: resultTempUser?._id,
-      email: resultTempUser?.email,
-      role: process.env.TEMP_ROLE,
-    };
+    if (isUserTypeExist?.name === "Agent") {
+      const resultTempAgentUser = await TempAgentUser.create({
+        first_name,
+        last_name,
+        country_code,
+        phone_number,
+        dob,
+        country_of_residance,
+        email,
+        user_type,
+        is_accepted_privacy_and_policy,
+        is_accepted_terms_and_condition,
+        codeExpires,
+        code,
 
-    const temptoken = generateTokenForInitiateSignUp(payload);
+        // Agent-specific fields
+        trade_license,
+        company_name,
+        office_address,
+        broker_license_number,
+        office_registration_number,
+        agency_logo,
+        agent_photo,
+      });
 
-    return res.status(200).json({
-      message: "Verification code sent to email.",
-      temporaryToken: temptoken,
-      code: code,
-      success: true,
-      status: 200,
-    });
+      if (!resultTempAgentUser || !resultTempAgentUser?._id) {
+        return res.status(500).json({
+          message: "Failed to save temporary user",
+          success: false,
+          status: 500,
+        });
+      }
+
+      const payload = {
+        id: resultTempUser?._id,
+        email: resultTempUser?.email,
+        role: process.env.TEMP_ROLE,
+      };
+
+      const temptoken = generateTokenForInitiateSignUp(payload);
+
+      return res.status(200).json({
+        message: "Verification code sent to email.",
+        temporaryToken: temptoken,
+        code: code,
+        success: true,
+        status: 200,
+      });
+    } else {
+      const resultTempUser = await TempUser.create({
+        first_name,
+        last_name,
+        country_code,
+        phone_number,
+        dob,
+        country_of_residance,
+        email,
+        user_type,
+        is_accepted_privacy_and_policy,
+        is_accepted_terms_and_condition,
+        codeExpires,
+        code,
+      });
+
+      if (!resultTempUser || !resultTempUser?._id) {
+        return res.status(500).json({
+          message: "Failed to save temporary user",
+          success: false,
+          status: 500,
+        });
+      }
+
+      const payload = {
+        id: resultTempUser?._id,
+        email: resultTempUser?.email,
+        role: process.env.TEMP_ROLE,
+      };
+
+      const temptoken = generateTokenForInitiateSignUp(payload);
+
+      return res.status(200).json({
+        message: "Verification code sent to email.",
+        temporaryToken: temptoken,
+        code: code,
+        success: true,
+        status: 200,
+      });
+    }
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",
@@ -179,10 +249,22 @@ exports.setPassword = async (req, res) => {
       });
     }
 
+    const isUserTypeExist = await UserType.findById({
+      _id: isTempUserExist?.user_type,
+    });
+
+    if (!isUserTypeExist) {
+      return res.status(400).json({
+        message: "User type does not exist.",
+        success: false,
+        status: 400,
+      });
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const resultUser = await User.create({
+    const commonFields = {
       first_name: isTempUserExist?.first_name,
       last_name: isTempUserExist?.last_name,
       country_code: isTempUserExist?.country_code,
@@ -201,8 +283,45 @@ exports.setPassword = async (req, res) => {
       is_email_verified: true,
       is_phone_verified: false,
       is_blocked: false,
-    });
+    };
 
+    // const resultUser = await User.create({
+    //   first_name: isTempUserExist?.first_name,
+    //   last_name: isTempUserExist?.last_name,
+    //   country_code: isTempUserExist?.country_code,
+    //   phone_number: isTempUserExist?.phone_number,
+    //   dob: isTempUserExist?.dob,
+    //   country_of_residance: isTempUserExist?.country_of_residance,
+    //   email: isTempUserExist?.email,
+    //   password: hashedPassword,
+    //   user_type: new mongoose.Types.ObjectId(
+    //     String(isTempUserExist?.user_type)
+    //   ),
+    //   is_accepted_privacy_and_policy:
+    //     isTempUserExist?.is_accepted_privacy_and_policy,
+    //   is_accepted_terms_and_condition:
+    //     isTempUserExist?.is_accepted_terms_and_condition,
+    //   is_email_verified: true,
+    //   is_phone_verified: false,
+    //   is_blocked: false,
+    // });
+
+    let resultUser;
+    if (isUserTypeExist?.name === "Agent") {
+      // Add agent-specific fields
+      resultUser = await User.create({
+        ...commonFields,
+        trade_license: isTempUserExist?.trade_license,
+        company_name: isTempUserExist?.company_name,
+        office_address: isTempUserExist?.office_address,
+        broker_license_number: isTempUserExist?.broker_license_number,
+        office_registration_number: isTempUserExist?.office_registration_number,
+        agency_logo: isTempUserExist?.agency_logo,
+        agent_photo: isTempUserExist?.agent_photo,
+      });
+    } else {
+      resultUser = await User.create(commonFields);
+    }
     if (resultUser) {
       await TempUser.findByIdAndDelete(isTempUserExist?._id);
 
@@ -556,6 +675,38 @@ exports.updateUserStatusWithKey = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       message: "Internal Server Error",
+      error: error?.message,
+      status: 500,
+      success: false,
+    });
+  }
+};
+
+exports.getUserAllDetails = async (req, res) => {
+  try {
+    const email = req?.user?.email;
+    const isUserExist = await User.findOne({ email }).select(
+      "-password -tokenVersion"
+    );
+
+    if (!isUserExist) {
+      return res.status(404).json({
+        message: "User with this email is not exists.",
+        success: false,
+        status: 404,
+      });
+    }
+
+    return res.status(200).json({
+      message: "User details fetched successfully!",
+      data: isUserExist,
+      status: 200,
+      success: true,
+    });
+    
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
       error: error?.message,
       status: 500,
       success: false,

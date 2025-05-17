@@ -4,5 +4,6 @@ exports.CategoryEndpoints={
     createCategory: '/add-category',
     updateCategory: '/update-category/:id',
     deleteCategory: '/delete-category/:id',
-    updateCategoryStatus: '/update-category-status/:id'
+    updateCategoryStatus: '/update-category-status/:id',
+    getAllActiveCategory: '/getall-active-category'
 }

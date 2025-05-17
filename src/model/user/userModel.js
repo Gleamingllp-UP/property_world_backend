@@ -89,6 +89,22 @@ const userSchema = mongoose.Schema(
       type: Date,
       default: null,
     },
+    languages: {
+      type: [String],
+      default: [],
+    },
+    rating: {
+      type: Number,
+      default: 0,
+    },
+    expertise: {
+      type: String,
+      default: null,
+    },
+    experience: {
+      type: Number,
+      default: 0,
+    },
     tokenVersion: {
       type: Number,
       default: 0,

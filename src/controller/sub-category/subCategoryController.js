@@ -5,7 +5,7 @@ exports.addSubCategory = async (req, res) => {
   try {
     const { name, categoryId } = req.body;
 
-    const isSubCategoryExist = await SubCategory.findOne({ name ,categoryId});
+    const isSubCategoryExist = await SubCategory.findOne({ name, categoryId });
     if (isSubCategoryExist) {
       return res.status(400).json({
         message: "SubCategory already exists",
@@ -56,7 +56,7 @@ exports.addSubCategory = async (req, res) => {
 
 exports.getAllSubCategory = async (req, res) => {
   try {
-    let { page = 1, limit = 10,categoryId } = req.query;
+    let { page = 1, limit = 10, categoryId } = req.query;
     page = parseInt(page);
     limit = parseInt(limit);
 
@@ -119,6 +119,7 @@ exports.getAllSubCategory = async (req, res) => {
   }
 };
 
+
 exports.updateSubCategory = async (req, res) => {
   try {
     const { name, categoryId } = req.body;
@@ -164,18 +165,18 @@ exports.updateSubCategory = async (req, res) => {
     const result = await isSubCategoryExist.save();
 
     const populatedSubCategory = await SubCategory.findById(
-        result?._id
-      ).populate("categoryId", "name status");
-  
-      const subCatObj = populatedSubCategory.toObject();
-  
-      subCatObj.categoryData = subCatObj.categoryId || null;
-  
-      delete subCatObj.categoryId;
-  
-      if (subCatObj.categoryData && subCatObj.categoryData.status === false) {
-        subCatObj.status = false;
-      }
+      result?._id
+    ).populate("categoryId", "name status");
+
+    const subCatObj = populatedSubCategory.toObject();
+
+    subCatObj.categoryData = subCatObj.categoryId || null;
+
+    delete subCatObj.categoryId;
+
+    if (subCatObj.categoryData && subCatObj.categoryData.status === false) {
+      subCatObj.status = false;
+    }
 
     if (subCatObj) {
       return res.status(200).json({
@@ -273,6 +274,75 @@ exports.updateSubCategoryStatus = async (req, res) => {
       return res.status(500).json({
         message: "Error updating SubCategory",
         status: 500,
+        success: false,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error?.message,
+      status: 500,
+      success: false,
+    });
+  }
+};
+
+
+//For User
+exports.getAllActiveSubCategory = async (req, res) => {
+  try {
+    let { page = 1, limit = 10, categoryId } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const skip = (page - 1) * limit;
+
+    const filter = {
+      status: true,
+    };
+    if (categoryId) {
+      filter.categoryId = categoryId;
+    }
+
+    const result = await SubCategory.find(filter)
+      .populate("categoryId", "name status")
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const total = await SubCategory.countDocuments(filter);
+
+    const modifiedResult = result.map((subCat) => {
+      const subCatObj = subCat.toObject();
+
+      subCatObj.categoryData = subCatObj.categoryId || null;
+
+      delete subCatObj.categoryId;
+
+      if (subCatObj.categoryData && subCatObj.categoryData.status === false) {
+        subCatObj.status = false;
+      }
+
+      return subCatObj;
+    });
+
+    if (modifiedResult) {
+      return res.status(200).json({
+        message: "SubCategories fetched successfully",
+        data: modifiedResult,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+        status: 200,
+        success: true,
+      });
+    } else {
+      return res.status(404).json({
+        message: "Error in database",
+        status: 404,
         success: false,
       });
     }

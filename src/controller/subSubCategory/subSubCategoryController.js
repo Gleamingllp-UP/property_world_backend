@@ -56,7 +56,7 @@ exports.addSubSubCategory = async (req, res) => {
 
 exports.getAllSubSubCategory = async (req, res) => {
   try {
-    let { page = 1, limit = 10,subCategoryId } = req.query;
+    let { page = 1, limit = 10, subCategoryId } = req.query;
     page = parseInt(page);
     limit = parseInt(limit);
 
@@ -82,7 +82,10 @@ exports.getAllSubSubCategory = async (req, res) => {
 
       delete subSubCatObj.subCategoryId;
 
-      if (subSubCatObj.subCategoryData && subSubCatObj.subCategoryData.status === false) {
+      if (
+        subSubCatObj.subCategoryData &&
+        subSubCatObj.subCategoryData.status === false
+      ) {
         subSubCatObj.status = false;
       }
 
@@ -128,7 +131,10 @@ exports.updateSubSubCategory = async (req, res) => {
       name: { $regex: `^${name}$`, $options: "i" },
     });
 
-    if (existingSubSubCategory && existingSubSubCategory._id.toString() !== id) {
+    if (
+      existingSubSubCategory &&
+      existingSubSubCategory._id.toString() !== id
+    ) {
       return res.status(400).json({
         message: "Sub-SubCategory with this name already exists",
         status: 400,
@@ -164,18 +170,21 @@ exports.updateSubSubCategory = async (req, res) => {
     const result = await isSubSubCategoryExist.save();
 
     const populatedSubSubCategory = await SubSubCategory.findById(
-        result?._id
-      ).populate("subCategoryId", "name status");
-  
-      const subSubCatObj = populatedSubSubCategory.toObject();
-  
-      subSubCatObj.subCategoryData = subSubCatObj.subCategoryId || null;
-  
-      delete subSubCatObj.subCategoryId;
-  
-      if (subSubCatObj.subCategoryData && subSubCatObj.subCategoryData.status === false) {
-        subSubCatObj.status = false;
-      }
+      result?._id
+    ).populate("subCategoryId", "name status");
+
+    const subSubCatObj = populatedSubSubCategory.toObject();
+
+    subSubCatObj.subCategoryData = subSubCatObj.subCategoryId || null;
+
+    delete subSubCatObj.subCategoryId;
+
+    if (
+      subSubCatObj.subCategoryData &&
+      subSubCatObj.subCategoryData.status === false
+    ) {
+      subSubCatObj.status = false;
+    }
 
     if (subSubCatObj) {
       return res.status(200).json({
@@ -273,6 +282,77 @@ exports.updateSubSubCategoryStatus = async (req, res) => {
       return res.status(500).json({
         message: "Error updating Sub-SubCategory",
         status: 500,
+        success: false,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error?.message,
+      status: 500,
+      success: false,
+    });
+  }
+};
+
+//For User
+exports.getAllActiveSubSubCategory = async (req, res) => {
+  try {
+    let { page = 1, limit = 1000, subCategoryId } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const skip = (page - 1) * limit;
+
+    const filter = {
+      status: true,
+    };
+    if (subCategoryId) {
+      filter.subCategoryId = subCategoryId;
+    }
+
+    const result = await SubSubCategory.find(filter)
+      .populate("subCategoryId", "name status")
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const total = await SubSubCategory.countDocuments(filter);
+
+    const modifiedResult = result.map((subSubCat) => {
+      const subSubCatObj = subSubCat.toObject();
+
+      subSubCatObj.subCategoryData = subSubCatObj.subCategoryId || null;
+
+      delete subSubCatObj.subCategoryId;
+
+      if (
+        subSubCatObj.subCategoryData &&
+        subSubCatObj.subCategoryData.status === false
+      ) {
+        subSubCatObj.status = false;
+      }
+
+      return subSubCatObj;
+    });
+
+    if (modifiedResult) {
+      return res.status(200).json({
+        message: "Sub-SubCategories fetched successfully",
+        data: modifiedResult,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+        status: 200,
+        success: true,
+      });
+    } else {
+      return res.status(404).json({
+        message: "Error in database",
+        status: 404,
         success: false,
       });
     }

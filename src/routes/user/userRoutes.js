@@ -8,6 +8,7 @@ const {
   getAllUsers,
   initiateSignupByAdmin,
   updateUserStatusWithKey,
+  getUserAllDetails,
 } = require("../../controller/user/userController");
 const {
   validateOnlyAllowedFields,
@@ -29,6 +30,9 @@ const {
 const {
   verifyTokenForTempUser,
 } = require("../../middleWares/TokenVerification/verifyTokenForTempUser");
+const {
+  verifyTokenUser,
+} = require("../../middleWares/TokenVerification/verifyTokenUser");
 const {
   verifyTokenAdmin,
 } = require("../../middleWares/TokenVerification/verifyTokenAdmin");
@@ -96,5 +100,10 @@ userRouter.put(
 );
 
 userRouter.get(userEndpoints.getAllUser, verifyTokenAdmin, getAllUsers);
+userRouter.get(
+  userEndpoints.getUserAllDetails,
+  verifyTokenUser,
+  getUserAllDetails
+);
 
 module.exports = userRouter;

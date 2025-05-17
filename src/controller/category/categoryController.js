@@ -224,3 +224,47 @@ exports.updateCategoryStatus = async (req, res) => {
     });
   }
 };
+
+//For Categorys Only
+exports.getAllActiveCategory= async (req, res) => {
+  try {
+    let { page = 1, limit = 10 } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const skip = (page - 1) * limit;
+    const result = await Category.find({ status: true })
+      .skip(skip)
+      .limit(limit)
+      .sort({ name: 1 });
+
+    const total = await Category.countDocuments({ status: true });
+    if (result) {
+      return res.status(200).json({
+        message: "Category type fetched",
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+        data: result,
+        status: 200,
+        success: true,
+      });
+    } else {
+      return res.status(404).json({
+        message: "Error in database",
+        status: 404,
+        success: false,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error?.message,
+      status: 500,
+      success: false,
+    });
+  }
+};

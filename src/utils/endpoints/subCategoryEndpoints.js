@@ -1,5 +1,6 @@
 exports.subCategoryEndpoints={
     getsubCategory: '/subCategory/:id',
+    getAllActivesubCategory: '/getall-active-subCategory',
     getAllsubCategory: '/getall-subCategory',
     createsubCategory: '/add-subCategory',
     updatesubCategory: '/update-subCategory/:id',

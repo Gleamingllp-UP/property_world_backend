@@ -6,6 +6,9 @@ const {
   verifyTokenAdmin,
 } = require("../../middleWares/TokenVerification/verifyTokenAdmin");
 const {
+  verifyTokenUser,
+} = require("../../middleWares/TokenVerification/verifyTokenUser");
+const {
   validateOnlyAllowedFields,
 } = require("../../middleWares/validateOnlyAllowedFields");
 const {
@@ -19,7 +22,8 @@ const {
   getAllSubCategory,
   deleteSubCategory,
   updateSubCategoryStatus,
-  updateSubCategory
+  updateSubCategory,
+  getAllActiveSubCategory,
 } = require("../../controller/sub-category/subCategoryController");
 const { validateCategoryDeleteInput } = require("../../validators/category");
 
@@ -40,13 +44,19 @@ subCategoryRouter.get(
   getAllSubCategory
 );
 
+subCategoryRouter.get(
+  subCategoryEndpoints.getAllActivesubCategory,
+  verifyTokenUser,
+  getAllActiveSubCategory
+);
+
 subCategoryRouter.put(
   subCategoryEndpoints.updatesubCategory,
   verifyTokenAdmin,
   validateOnlyAllowedFields(["name", "categoryId"]),
   validateSubCategoryUpdateInput,
   validate,
-  updateSubCategory,
+  updateSubCategory
 );
 
 subCategoryRouter.delete(

@@ -10,4 +10,5 @@ exports.userEndpoints = {
   updateUser: "/users/:id",
   deleteUser: "/users/:id",
   updateUserStatusWithKey: "/update-key-status/:id",
+  getUserAllDetails: "/get-user-all-details",
 };

@@ -6,6 +6,9 @@ const {
   verifyTokenAdmin,
 } = require("../../middleWares/TokenVerification/verifyTokenAdmin");
 const {
+  verifyTokenUser,
+} = require("../../middleWares/TokenVerification/verifyTokenUser");
+const {
   validateOnlyAllowedFields,
 } = require("../../middleWares/validateOnlyAllowedFields");
 const {
@@ -21,6 +24,7 @@ const {
   updateCategory,
   deleteCategory,
   updateCategoryStatus,
+  getAllActiveCategory,
 } = require("../../controller/category/categoryController");
 
 const categoryRouter = express.Router();
@@ -65,6 +69,21 @@ categoryRouter.put(
   validateCategoryStatusInput,
   validate,
   updateCategoryStatus
+);
+
+categoryRouter.put(
+  CategoryEndpoints.updateCategoryStatus,
+  verifyTokenAdmin,
+  validateOnlyAllowedFields([]),
+  validateCategoryStatusInput,
+  validate,
+  updateCategoryStatus
+);
+
+categoryRouter.get(
+  CategoryEndpoints.getAllActiveCategory,
+  verifyTokenUser,
+  getAllActiveCategory
 );
 
 module.exports = categoryRouter;
