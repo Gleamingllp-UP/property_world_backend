@@ -441,7 +441,7 @@ exports.initiateSignupByAdmin = async (req, res) => {
 exports.userLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("user_type");
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({
@@ -493,7 +493,9 @@ exports.userLogin = async (req, res) => {
     const payload = {
       id: user?._id,
       email: user?.email,
-      role: user?.user_type,
+      role: user?.user_type?.name,
+      ip: req.ip,
+      ua: req.headers["user-agent"],
     };
 
     const token = generateTokenForUserLogin(payload);
@@ -703,13 +705,40 @@ exports.getUserAllDetails = async (req, res) => {
       status: 200,
       success: true,
     });
-    
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",
       error: error?.message,
       status: 500,
       success: false,
+    });
+  }
+};
+
+exports.guestUserLogin = async (req, res) => {
+  try {
+    const payload = {
+      role: "guest",
+      issuedAt: Date.now(),
+      ip: req.ip,
+      ua: req.headers["user-agent"],
+    };
+
+    const token = generateTokenForUserLogin(payload);
+
+    return res.status(200).json({
+      message: "Guest Login successful",
+      success: true,
+      status: 200,
+      data: [],
+      token: token,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error?.message,
+      success: false,
+      status: 500,
     });
   }
 };

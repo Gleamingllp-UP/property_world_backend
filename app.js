@@ -27,6 +27,8 @@ mongoose
     console.log("Mongodb is not connected...", err);
   });
 
+app.set("trust proxy", true);
+
 const adminRoutes = require("./src/routes/admin/adminRoutes");
 app.use("/admin", adminRoutes);
 

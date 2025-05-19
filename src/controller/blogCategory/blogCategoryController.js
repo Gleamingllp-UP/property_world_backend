@@ -1,4 +1,5 @@
 const BlogCategory = require("../../model/blogCategory/blogCategoryModel");
+const BlogPost = require("../../model/blog/blogModel");
 
 exports.addBlogCategory = async (req, res) => {
   try {
@@ -244,6 +245,61 @@ exports.updateBlogCategoryStatus = async (req, res) => {
         success: false,
       });
     }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error?.message,
+      status: 500,
+      success: false,
+    });
+  }
+};
+
+exports.getBlogCategoryWithCount = async (req, res) => {
+  try {
+    const blogResult = await BlogCategory.aggregate([
+      { $match: { status: true } },
+      {
+        $lookup: {
+          from: "blogposts",
+          localField: "_id",
+          foreignField: "blogCategoryId",
+          as: "blogs",
+        },
+      },
+      {
+        $addFields: {
+          blog_count: { $size: "$blogs" },
+        },
+      },
+      {
+        $project: {
+          _id: 1, 
+          name: 1,
+          blog_count: 1,
+        },
+      },
+      {
+        $sort: { blog_count: -1 },
+      },
+    ]);
+
+    const blogPost = blogResult;
+
+    if (!blogPost) {
+      return res.status(404).json({
+        message: "Blog post not found",
+        status: 404,
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Blog post retrieved successfully",
+      status: 200,
+      success: true,
+      data: blogPost,
+    });
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",

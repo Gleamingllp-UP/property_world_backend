@@ -9,6 +9,7 @@ const {
   initiateSignupByAdmin,
   updateUserStatusWithKey,
   getUserAllDetails,
+  guestUserLogin,
 } = require("../../controller/user/userController");
 const {
   validateOnlyAllowedFields,
@@ -104,6 +105,10 @@ userRouter.get(
   userEndpoints.getUserAllDetails,
   verifyTokenUser,
   getUserAllDetails
+);
+userRouter.post(
+  userEndpoints.guestUserLogin,
+  guestUserLogin
 );
 
 module.exports = userRouter;

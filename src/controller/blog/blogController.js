@@ -367,3 +367,146 @@ exports.updateBlogPostStatus = async (req, res) => {
     });
   }
 };
+
+// For User Only
+exports.getAllBlogPostForUser = async (req, res) => {
+  try {
+    let { page = 1, limit = 10, blog_category_id } = req.query;
+
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const skip = (page - 1) * limit;
+
+    const filter = { status: true };
+
+    if (blog_category_id && mongoose.Types.ObjectId.isValid(blog_category_id)) {
+      filter.blogCategoryId = new mongoose.Types.ObjectId(
+        String(blog_category_id)
+      );
+    }
+
+    const blogResult = await BlogPost.aggregate([
+      { $match: filter },
+      {
+        $lookup: {
+          from: "blogcategories",
+          localField: "blogCategoryId",
+          foreignField: "_id",
+          as: "blog_category",
+        },
+      },
+      //$unwind fails when blog_category is empty or missing so we can use like this
+      { $unwind: { path: "$blog_category", preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          blogCategory: {
+            _id: "$blog_category._id",
+            name: "$blog_category.name",
+            status: "$blog_category.status",
+          },
+        },
+      },
+      { $unset: ["blog_category", "blogCategoryId"] },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
+
+    const total = await BlogPost.countDocuments(filter);
+
+    if (blogResult) {
+      return res.status(200).json({
+        message: "Blog post retrieved successfully",
+        status: 200,
+        success: true,
+        data: blogResult,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server error",
+      error: error?.message,
+      status: 500,
+      success: false,
+    });
+  }
+};
+
+exports.getBlogPostByIdForUser = async (req, res) => {
+  try {
+    const blogPostId = req.params.id;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(blogPostId)) {
+      return res.status(400).json({
+        message: "Invalid blog post ID",
+        status: 400,
+        success: false,
+      });
+    }
+
+    // Find blog post with category info using aggregation
+    const blogResult = await BlogPost.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(String(blogPostId)) } },
+      {
+        $lookup: {
+          from: "blogcategories",
+          localField: "blogCategoryId",
+          foreignField: "_id",
+          as: "blog_category",
+        },
+      },
+      {
+        $unwind: {
+          path: "$blog_category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          blogCategory: {
+            _id: "$blog_category._id",
+            name: "$blog_category.name",
+            status: "$blog_category.status",
+          },
+        },
+      },
+      {
+        $unset: ["blog_category", "blogCategoryId"],
+      },
+    ]);
+
+    const blogPost = blogResult[0];
+
+    if (!blogPost) {
+      return res.status(404).json({
+        message: "Blog post not found",
+        status: 404,
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Blog post retrieved successfully",
+      status: 200,
+      success: true,
+      data: blogPost,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error?.message,
+      status: 500,
+      success: false,
+    });
+  }
+};
+
+

@@ -4,6 +4,9 @@ const {
   verifyTokenAdmin,
 } = require("../../middleWares/TokenVerification/verifyTokenAdmin");
 const {
+  verifyTokenUser,
+} = require("../../middleWares/TokenVerification/verifyTokenUser");
+const {
   validateOnlyAllowedFields,
 } = require("../../middleWares/validateOnlyAllowedFields");
 const { blogAllowedFields } = require("../../utils/validateFields/blogFields");
@@ -22,6 +25,8 @@ const {
   deleteBlogPost,
   getBlogPostById,
   updateBlogPostStatus,
+  getAllBlogPostForUser,
+  getBlogPostByIdForUser,
 } = require("../../controller/blog/blogController");
 const {
   dynamicSingleImageUpload,
@@ -47,6 +52,15 @@ blogRouter.get(
   validatorBlogPostGetByIdInput,
   validate,
   getBlogPostById
+);
+blogRouter.get(blogEndpoints.getAllblogForUser, verifyTokenUser, getAllBlogPostForUser);
+
+blogRouter.get(
+  blogEndpoints.getblogForUser,
+  verifyTokenUser,
+  validatorBlogPostGetByIdInput,
+  validate,
+  getBlogPostByIdForUser
 );
 
 blogRouter.put(

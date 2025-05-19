@@ -6,6 +6,9 @@ const {
   verifyTokenAdmin,
 } = require("../../middleWares/TokenVerification/verifyTokenAdmin");
 const {
+  verifyTokenUser,
+} = require("../../middleWares/TokenVerification/verifyTokenUser");
+const {
   validateOnlyAllowedFields,
 } = require("../../middleWares/validateOnlyAllowedFields");
 const {
@@ -22,6 +25,7 @@ const {
   deleteBlogCategory,
   updateBlogCategoryStatus,
   getAllDefaulteBlogCategory,
+  getBlogCategoryWithCount,
 } = require("../../controller/blogCategory/blogCategoryController");
 
 const blogCategoryRouter = express.Router();
@@ -72,6 +76,12 @@ blogCategoryRouter.put(
   validatorBlogCategoryStatusInput,
   validate,
   updateBlogCategoryStatus
+);
+
+blogCategoryRouter.get(
+  BlogCategoryEndpoints.getBlogCategoryWithCount,
+  verifyTokenUser,
+  getBlogCategoryWithCount
 );
 
 module.exports = blogCategoryRouter;

@@ -1,3 +1,4 @@
+
 exports.BlogCategoryEndpoints={
     getBlogCategory: '/blogCategory/:id',
     getAllBlogCategory: '/getall-blogCategory',
@@ -5,5 +6,7 @@ exports.BlogCategoryEndpoints={
     createBlogCategory: '/add-blogCategory',
     updateBlogCategory: '/update-blogCategory/:id',
     deleteBlogCategory: '/delete-blogCategory/:id',
-    updateBlogCategoryStatus: '/update-blogCategory-status/:id'
+    updateBlogCategoryStatus: '/update-blogCategory-status/:id',
+
+    getBlogCategoryWithCount:'/getall-blog-count',
 }

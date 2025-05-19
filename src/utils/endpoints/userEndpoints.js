@@ -1,3 +1,4 @@
+
 exports.userEndpoints = {
   initiateSignup: "/initiate-signup/",
   initiateSignupByAdmin: "/initiate-signup-by-admin/",
@@ -11,4 +12,5 @@ exports.userEndpoints = {
   deleteUser: "/users/:id",
   updateUserStatusWithKey: "/update-key-status/:id",
   getUserAllDetails: "/get-user-all-details",
+  guestUserLogin: "/guest-user-login",
 };

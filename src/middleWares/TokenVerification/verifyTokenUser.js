@@ -19,6 +19,13 @@ exports.verifyTokenUser = async (req, res, next) => {
       });
     }
 
+    const tokenIP = decoded.ip;
+    const requestIP = req.ip;
+
+    if (tokenIP !== requestIP) {
+      return res.status(403).json({ message: "IP address mismatch" });
+    }
+
     req.user = decoded;
     next();
   } catch (error) {
