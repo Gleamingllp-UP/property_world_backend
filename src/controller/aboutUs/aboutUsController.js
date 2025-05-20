@@ -313,3 +313,50 @@ exports.updateAboutUsStatus = async (req, res) => {
     });
   }
 };
+
+// For User
+
+exports.getAllAboutUsForUser = async (req, res) => {
+  try {
+    let { page = 1, limit = 10 } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const skip = (page - 1) * limit;
+
+    const result = await AboutUs.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const total = await AboutUs.countDocuments();
+
+    if (result) {
+      return res.status(200).json({
+        message: "AboutUss fetched successfully",
+        data: result,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+        status: 200,
+        success: true,
+      });
+    } else {
+      return res.status(404).json({
+        message: "Error in database",
+        status: 404,
+        success: false,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error?.message,
+      status: 500,
+      success: false,
+    });
+  }
+};

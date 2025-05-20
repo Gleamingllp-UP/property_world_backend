@@ -149,3 +149,26 @@ exports.deletePolicy = async (req, res) => {
     });
   }
 };
+
+exports.getPolicyByTypeForUser = async (req, res) => {
+  try {
+    const { type } = req.query;
+
+    const policy = await Policy.findOne({ type: type });
+
+      return res.status(200).json({
+        message: "Policy Fetched",
+        status: 200,
+        success: true,
+        data: policy || null
+      });
+   
+  } catch (error) {
+    return res.status(500).json({
+      message: "Inernal server error!",
+      error: error?.message,
+      status: 500,
+      success: false,
+    });
+  }
+};

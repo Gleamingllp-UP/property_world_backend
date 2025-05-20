@@ -4,6 +4,9 @@ const {
   verifyTokenAdmin,
 } = require("../../middleWares/TokenVerification/verifyTokenAdmin");
 const {
+  verifyTokenUser,
+} = require("../../middleWares/TokenVerification/verifyTokenUser");
+const {
   validateOnlyAllowedFields,
 } = require("../../middleWares/validateOnlyAllowedFields");
 const {
@@ -23,6 +26,7 @@ const {
   deleteAboutUs,
   updateAboutUsStatus,
   getAllAboutUs,
+  getAllAboutUsForUser,
 } = require("../../controller/aboutUs/aboutUsController");
 const { createUploader } = require("../../middleWares/fileUpload/uploadFile");
 
@@ -43,7 +47,11 @@ aboutUsRouter.post(
   addAboutUs
 );
 
-aboutUsRouter.get(aboutUsEndpoints.getAllAboutUs, verifyTokenAdmin, getAllAboutUs);
+aboutUsRouter.get(
+  aboutUsEndpoints.getAllAboutUs,
+  verifyTokenAdmin,
+  getAllAboutUs
+);
 
 aboutUsRouter.put(
   aboutUsEndpoints.updateAboutUs,
@@ -76,6 +84,13 @@ aboutUsRouter.put(
   validatorAboutUsUpdateStatusIdInput,
   validate,
   updateAboutUsStatus
+);
+
+// For User
+aboutUsRouter.get(
+  aboutUsEndpoints.getAllAboutUsForUser,
+  verifyTokenUser,
+  getAllAboutUsForUser
 );
 
 module.exports = aboutUsRouter;
