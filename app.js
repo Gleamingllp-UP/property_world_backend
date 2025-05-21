@@ -68,6 +68,9 @@ app.use("/policy", policyRouter);
 const socialMediaRouter = require("./src/routes/socialMedia/socialMediaRoutes");
 app.use("/social-media", socialMediaRouter);
 
+const bannerRouter = require("./src/routes/banner/bannerRoutes");
+app.use("/banner", bannerRouter);
+
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
