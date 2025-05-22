@@ -7,7 +7,7 @@ const agentUserSchema = new mongoose.Schema({
   // contact_name: { type: String, required: true },
   // contact_number: { type: Number, required: true },
   office_address: { type: String, required: true },
-  broker_license_number: { type: Number, required: true },
+  broker_license_number: { type: String, required: true },
   office_registration_number: { type: String, required: true },
   agency_logo: { type: String },
   agent_photo: { type: String },

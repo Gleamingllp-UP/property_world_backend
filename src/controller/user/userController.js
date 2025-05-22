@@ -4,6 +4,7 @@ const generateCode = require("../../utils/functions/generateCode");
 const bcrypt = require("bcryptjs");
 const TempUser = require("../../model/user/tempUserModel");
 const TempAgentUser = require("../../model/user/tempAgentModel");
+const AgentUser = require("../../model/user/agentModel");
 const mongoose = require("mongoose");
 const sendEmailForCode = require("../../utils/sendEmails/sendEmailForCode");
 const {
@@ -15,6 +16,9 @@ const {
 const {
   generateRandomPassword,
 } = require("../../utils/functions/generateRandomPassword");
+const {
+  uploadImageOnAwsReturnUrl,
+} = require("../../utils/functions/uploadFilesOnAws");
 
 exports.initiateSignup = async (req, res) => {
   try {
@@ -58,6 +62,37 @@ exports.initiateSignup = async (req, res) => {
       await existingTempUser.deleteOne();
     }
 
+    const file1 = req.files?.broker_license_number?.[0];
+    const file2 = req.files?.office_registration_number?.[0];
+    const file3 = req.files?.agency_logo?.[0];
+    const file4 = req.files?.agent_photo?.[0];
+
+    let broker_license_number_file = null;
+    let office_registration_number_file = null;
+    let agency_logo_file = null;
+    let agent_photo_file = null;
+
+    if (broker_license_number) {
+      broker_license_number_file = broker_license_number;
+    } else if(file1) {
+      broker_license_number_file = await uploadImageOnAwsReturnUrl(file1);
+    }
+    if (office_registration_number) {
+      office_registration_number_file = office_registration_number;
+    } else if (file2) {
+      office_registration_number_file = await uploadImageOnAwsReturnUrl(file2);
+    }
+    if (agency_logo) {
+      agency_logo_file = agency_logo;
+    } else if (file3) {
+      agency_logo_file = await uploadImageOnAwsReturnUrl(file3);
+    }
+    if (agent_photo) {
+      agent_photo_file = agent_photo;
+    } else if (file4) {
+      agent_photo_file = await uploadImageOnAwsReturnUrl(file4);
+    }
+
     // Generate code and expiration
     const code = generateCode();
     const codeExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
@@ -92,10 +127,10 @@ exports.initiateSignup = async (req, res) => {
         trade_license,
         company_name,
         office_address,
-        broker_license_number,
-        office_registration_number,
-        agency_logo,
-        agent_photo,
+        broker_license_number: broker_license_number_file,
+        office_registration_number: office_registration_number_file,
+        agency_logo: agency_logo_file,
+        agent_photo: agent_photo_file,
       });
 
       if (!resultTempAgentUser || !resultTempAgentUser?._id) {
@@ -107,8 +142,8 @@ exports.initiateSignup = async (req, res) => {
       }
 
       const payload = {
-        id: resultTempUser?._id,
-        email: resultTempUser?.email,
+        id: resultTempAgentUser?._id,
+        email: resultTempAgentUser?.email,
         role: process.env.TEMP_ROLE,
       };
 
@@ -248,6 +283,13 @@ exports.setPassword = async (req, res) => {
         status: 404,
       });
     }
+    if (!isTempUserExist.is_email_verified) {
+      return res.status(404).json({
+        message: "Email is not verified.",
+        success: false,
+        status: 404,
+      });
+    }
 
     const isUserTypeExist = await UserType.findById({
       _id: isTempUserExist?.user_type,
@@ -285,31 +327,11 @@ exports.setPassword = async (req, res) => {
       is_blocked: false,
     };
 
-    // const resultUser = await User.create({
-    //   first_name: isTempUserExist?.first_name,
-    //   last_name: isTempUserExist?.last_name,
-    //   country_code: isTempUserExist?.country_code,
-    //   phone_number: isTempUserExist?.phone_number,
-    //   dob: isTempUserExist?.dob,
-    //   country_of_residance: isTempUserExist?.country_of_residance,
-    //   email: isTempUserExist?.email,
-    //   password: hashedPassword,
-    //   user_type: new mongoose.Types.ObjectId(
-    //     String(isTempUserExist?.user_type)
-    //   ),
-    //   is_accepted_privacy_and_policy:
-    //     isTempUserExist?.is_accepted_privacy_and_policy,
-    //   is_accepted_terms_and_condition:
-    //     isTempUserExist?.is_accepted_terms_and_condition,
-    //   is_email_verified: true,
-    //   is_phone_verified: false,
-    //   is_blocked: false,
-    // });
-
+    
     let resultUser;
     if (isUserTypeExist?.name === "Agent") {
       // Add agent-specific fields
-      resultUser = await User.create({
+      resultUser = await AgentUser.create({
         ...commonFields,
         trade_license: isTempUserExist?.trade_license,
         company_name: isTempUserExist?.company_name,

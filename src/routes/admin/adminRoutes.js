@@ -49,7 +49,6 @@ adminRouter.post(
 
 adminRouter.post(
   adminEndpoints.forgetPassword,
-  verifyTokenAdmin,
   validateOnlyAllowedFields(["email"]),
   validateInputForForgetPassword,
   validate,

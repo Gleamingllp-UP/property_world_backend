@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const UserType = require("../user-types/userTypeModel");
 const Property = require("../../model/property/propertyModel");
 
-const options = { discriminatorKey: "user_type", timestamps: true };
-
+const options = { discriminatorKey: "_t", timestamps: true };
+// discriminatorKey should not be any field key name otherwise it will overwrite the field
 const userSchema = mongoose.Schema(
   {
     first_name: {

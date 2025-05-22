@@ -26,7 +26,7 @@ exports.validatorUserVerifyCodeInput = [
 exports.validatorUserSetPasswordInput = [
   body("email")
     .notEmpty()
-    .withMessage("Email is required") 
+    .withMessage("Email is required")
     .bail()
     .isString()
     .withMessage("Email must be a string")
@@ -106,7 +106,11 @@ exports.validatorInitiateSignUp = [
     .withMessage("Phone number must be numeric")
     .bail(),
 
-  body("dob").notEmpty().withMessage("Date of birth is required").bail(),
+  body("dob")
+    .optional()
+    .isDate()
+    .withMessage("Date of birth is required")
+    .bail(),
 
   body("country_of_residance")
     .trim()
@@ -152,6 +156,19 @@ exports.validatorInitiateSignUp = [
     .isBoolean()
     .withMessage("Terms acceptance must be boolean")
     .bail(),
+
+  body("trade_license")
+    .optional()
+    .isString()
+    .withMessage("Trade License must be a string"),
+  body("company_name")
+    .optional()
+    .isString()
+    .withMessage("Company Name must be a string"),
+  body("office_address")
+    .optional()
+    .isString()
+    .withMessage("Office Address must be a string"),
 ];
 
 exports.validatorUserStatusWithKeyInput = [

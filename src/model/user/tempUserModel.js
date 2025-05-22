@@ -26,7 +26,7 @@ const tempUserSchema = mongoose.Schema(
 
     dob: {
       type: Date,
-      required: true,
+      default: new Date(),
     },
 
     country_of_residance: {

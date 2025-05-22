@@ -37,6 +37,7 @@ const {
 const {
   verifyTokenAdmin,
 } = require("../../middleWares/TokenVerification/verifyTokenAdmin");
+const { createUploader } = require("../../middleWares/fileUpload/uploadFile");
 
 const userRouter = express.Router();
 
@@ -50,6 +51,12 @@ const userRouter = express.Router();
 
 userRouter.post(
   userEndpoints.initiateSignup,
+  createUploader([
+    { name: "broker_license_number", maxCount: 1 },
+    { name: "office_registration_number", maxCount: 1 },
+    { name: "agency_logo", maxCount: 1 },
+    { name: "agent_photo", maxCount: 1 },
+  ]),
   validateOnlyAllowedFields(signUpAllowedFields),
   validatorInitiateSignUp,
   validate,
@@ -106,9 +113,6 @@ userRouter.get(
   verifyTokenUser,
   getUserAllDetails
 );
-userRouter.post(
-  userEndpoints.guestUserLogin,
-  guestUserLogin
-);
+userRouter.post(userEndpoints.guestUserLogin, guestUserLogin);
 
 module.exports = userRouter;
