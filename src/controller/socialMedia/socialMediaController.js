@@ -227,3 +227,47 @@ exports.updateSocialMediaStatus = async (req, res) => {
     });
   }
 };
+
+//For users
+exports.getAllSocialMediaForUser = async (req, res) => {
+  try {
+    let { page = 1, limit = 10 } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const skip = (page - 1) * limit;
+    const result = await SocialMedia.find({ status: true })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: 1 });
+
+    const total = await SocialMedia.countDocuments({ status: true });
+    if (result) {
+      return res.status(200).json({
+        message: "User SocialMedia fetched",
+        data: result,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+        status: 200,
+        success: true,
+      });
+    } else {
+      return res.status(404).json({
+        message: "Error in database",
+        status: 404,
+        success: false,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error?.message,
+      status: 500,
+      success: false,
+    });
+  }
+};

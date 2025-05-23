@@ -29,6 +29,13 @@ exports.validatorAddContactUsInput = [
     .bail()
     .isLength({ min: 5 })
     .withMessage("Address must be at least 5 characters long"),
+
+  body("short_description")
+    .notEmpty()
+    .withMessage("Short Description is required")
+    .bail()
+    .isLength({ min: 5 })
+    .withMessage("Short Description must be at least 5 characters long"),
 ];
 
 

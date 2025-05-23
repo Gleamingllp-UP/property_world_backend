@@ -5,7 +5,8 @@ const {
 
 exports.addContactUs = async (req, res) => {
   try {
-    const { tele_phone, whatsapp_number, email, address, } = req.body;
+    const { tele_phone, whatsapp_number, email, address, short_description } =
+      req.body;
 
     const isContactUsExist = await ContactUs.find();
     if (isContactUsExist?.length > 0) {
@@ -35,6 +36,7 @@ exports.addContactUs = async (req, res) => {
       whatsapp_number,
       email,
       address,
+      short_description,
       coverImg: coverImageUrl,
     });
 
@@ -111,7 +113,14 @@ exports.getAllContactUs = async (req, res) => {
 
 exports.updateContactUs = async (req, res) => {
   try {
-    const { tele_phone, whatsapp_number, email, address, cover_img } = req.body;
+    const {
+      tele_phone,
+      whatsapp_number,
+      email,
+      address,
+      cover_img,
+      short_description,
+    } = req.body;
 
     const { id } = req.params;
 
@@ -133,6 +142,8 @@ exports.updateContactUs = async (req, res) => {
     if (whatsapp_number) isContactUsExist.whatsapp_number = whatsapp_number;
     if (email) isContactUsExist.email = email;
     if (address) isContactUsExist.address = address;
+    if (short_description)
+      isContactUsExist.short_description = short_description;
 
     if (coverImageUrl) isContactUsExist.coverImg = coverImageUrl;
 
@@ -201,4 +212,48 @@ exports.deleteContactUs = async (req, res) => {
   }
 };
 
+// For user
+exports.getAllContactUsForUser = async (req, res) => {
+  try {
+    let { page = 1, limit = 10 } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
 
+    const skip = (page - 1) * limit;
+
+    const result = await ContactUs.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const total = await ContactUs.countDocuments();
+
+    if (result) {
+      return res.status(200).json({
+        message: "ContactUs fetched successfully",
+        data: result,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+        status: 200,
+        success: true,
+      });
+    } else {
+      return res.status(404).json({
+        message: "Error in database",
+        status: 404,
+        success: false,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error?.message,
+      status: 500,
+      success: false,
+    });
+  }
+};

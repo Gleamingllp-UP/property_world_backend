@@ -7,6 +7,9 @@ const {
   verifyTokenAdmin,
 } = require("../../middleWares/TokenVerification/verifyTokenAdmin");
 const {
+  verifyTokenUser,
+} = require("../../middleWares/TokenVerification/verifyTokenUser");
+const {
   validateOnlyAllowedFields,
 } = require("../../middleWares/validateOnlyAllowedFields");
 const { validate } = require("../../middleWares/validate");
@@ -25,6 +28,7 @@ const {
   updateSocialMedia,
   deleteSocialMedia,
   updateSocialMediaStatus,
+  getAllSocialMediaForUser,
 } = require("../../controller/socialMedia/socialMediaController");
 
 const socialMediaRouter = express.Router();
@@ -42,6 +46,11 @@ socialMediaRouter.get(
   socialMediaEndpoints.getAllSocialMedia,
   verifyTokenAdmin,
   getAllSocialMedia
+);
+socialMediaRouter.get(
+  socialMediaEndpoints.getAllSocialMediaForUser,
+  verifyTokenUser,
+  getAllSocialMediaForUser
 );
 
 socialMediaRouter.put(

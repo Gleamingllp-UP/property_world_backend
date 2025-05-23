@@ -3,6 +3,7 @@ exports.contactUsAllowedFields = [
   "whatsapp_number",
   "email",
   "address",
+  "short_description",
   "cover_img",
 ];
 
@@ -11,5 +12,6 @@ exports.contactUsAllowedFieldsForUpdate = [
   "whatsapp_number",
   "email",
   "address",
+  "short_description",
   "cover_img",
 ];

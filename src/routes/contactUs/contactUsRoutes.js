@@ -7,6 +7,9 @@ const {
   verifyTokenAdmin,
 } = require("../../middleWares/TokenVerification/verifyTokenAdmin");
 const {
+  verifyTokenUser,
+} = require("../../middleWares/TokenVerification/verifyTokenUser");
+const {
   validateOnlyAllowedFields,
 } = require("../../middleWares/validateOnlyAllowedFields");
 const { validate } = require("../../middleWares/validate");
@@ -19,6 +22,7 @@ const {
   getAllContactUs,
   updateContactUs,
   deleteContactUs,
+  getAllContactUsForUser,
 } = require("../../controller/contactUs/contactUsController");
 const {
   dynamicSingleImageUpload,
@@ -45,6 +49,11 @@ contactUsRouter.get(
   contactUsEndpoints.getAllContactUs,
   verifyTokenAdmin,
   getAllContactUs
+);
+contactUsRouter.get(
+  contactUsEndpoints.getAllContactUsForUser,
+  verifyTokenUser,
+  getAllContactUsForUser
 );
 
 contactUsRouter.put(
